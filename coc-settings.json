@@ -1,0 +1,62 @@
+{
+    "suggest.timeout": 500,
+    "suggest.triggerAfterInsertEnter": true,
+    "suggest.minTriggerInputLength": 2,
+
+    "codeLens.enable": false,
+    "coc.preferences.colorSupport": true,
+    "diagnostic.displayByAle": true,
+
+    "coc.source.syntax.enable": true,
+    "coc.source.word.enable": true,
+
+    "yank.limit": 5,
+    "yank.highlight.duration": 300,
+
+    "suggest.languageSourcePriority": 4,
+    "yank.priority": 6,
+    "snippets.priority": 8,
+    "coc.source.syntax.priority": 10,
+    "coc.source.word.priority": 15,
+    "coc.source.file.priority": 20,
+
+    // The Language local to use when spell checking. "en" and "en-GB" are currently supported.
+    "cSpell.language": "en",
+
+    // Controls the number of suggestions shown.
+    "cSpell.numSuggestions": 8,
+
+    // The minimum length of a word before checking it against a dictionary.
+    "cSpell.minWordLength": 4,
+
+    // Enable / Disable the spell checker.
+    "cSpell.enabled": true,
+
+    // Display the spell checker status on the status bar.
+    "cSpell.showStatus": true,
+
+    // Enable / Disable compound words like 'errormessage'
+    "cSpell.allowCompoundWords": false,
+
+    // Set the delay before spell checking the document. Default is 50.
+    "cSpell.spellCheckDelayMs": 50,
+
+    "languageserver": {
+        "ccls": {
+            "command": "ccls",
+            "filetypes": ["c", "cpp", "objc", "objcpp"],
+            "rootPatterns": [".ccls", "compile_commands.json", ".git/", ".hg/"],
+            "initializationOptions": {
+                "cache": {
+                    "directory": ".cache/ccls"
+                },
+                "highlight": { "lsRanges" : true }
+            }
+        },
+        "clangd": {
+            "command": "clangd",
+            "rootPatterns": ["compile_flags.txt", "compile_commands.json", ".repo/", ".git/", ".hg/"],
+            "filetypes": ["c", "cpp", "objc", "objcpp"]
+        }
+     }
+}

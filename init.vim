@@ -391,19 +391,19 @@ endif
 " Plug Config: gesture.nvim {{{
 if isdirectory(expand(g:NvideConf_PluginDirectory . 'gesture.nvim'))
 nnoremap <silent> <RightMouse>   <Nop>
-nnoremap <silent> <RightDrag>    <Cmd>Gesture draw<CR>
-nnoremap <silent> <RightRelease> <Cmd>Gesture finish<CR>
+nnoremap <silent> <RightDrag>    <Cmd>lua require("gesture").draw()<CR>
+nnoremap <silent> <RightRelease> <Cmd>lua require("gesture").finish()<CR>
 lua << EOF
 local gesture = require('gesture')
 gesture.register({
-name = "go forward",
-inputs = { gesture.right() },
-action = [[lua vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-i>", true, false, true), "n", true)]]
+  name = "go forward",
+  inputs = { gesture.right() },
+  action = [[lua vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-i>", true, false, true), "n", true)]]
 })
 gesture.register({
-name = "go back",
-inputs = { gesture.left() },
-action = [[lua vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-o>", true, false, true), "n", true)]]
+  name = "go back",
+  inputs = { gesture.left() },
+  action = [[lua vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-o>", true, false, true), "n", true)]]
 })
 EOF
 endif

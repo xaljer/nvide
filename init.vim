@@ -196,12 +196,12 @@ Plug 'nvim-treesitter/nvim-treesitter'
 Plug 'nvim-treesitter/nvim-treesitter-refactor'
 Plug 'nvim-treesitter/nvim-treesitter-textobjects'
 Plug 'romgrk/nvim-treesitter-context'
+Plug 'p00f/nvim-ts-rainbow'
 
 " ========= edit enhancement ==========
 Plug 'inkarkat/vim-ingo-library'
 Plug 'inkarkat/vim-mark'
 Plug 'bronson/vim-visual-star-search'
-Plug 'luochen1990/rainbow'
 Plug 'Yggdroot/indentLine'
 Plug 'easymotion/vim-easymotion'
 Plug 'jiangmiao/auto-pairs'
@@ -305,32 +305,6 @@ nmap <A-n>      <Plug>MarkSearchGroupNext
 nmap <A-b>      <Plug>MarkSearchGroupPrev
 " }}}
 
-" Plug Config: rainbow {{{
-let g:rainbow_active = 1
-let g:rainbow_conf = {
-    \   'guifgs': ['royalblue2', 'darkorange3', 'seagreen3', 'firebrick'],
-    \   'ctermfgs': ['lightblue', 'lightyellow', 'lightcyan', 'lightmagenta'],
-    \   'operators': '_,_',
-    \   'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold'],
-    \   'separately': {
-    \       '*': {},
-    \       'tex': {
-    \           'parentheses': ['start=/(/ end=/)/', 'start=/\[/ end=/\]/'],
-    \       },
-    \       'lisp': {
-    \           'guifgs': ['royalblue3', 'darkorange3', 'seagreen3', 'firebrick', 'darkorchid3'],
-    \       },
-    \       'vim': {
-    \           'parentheses': ['start=/(/ end=/)/', 'start=/\[/ end=/\]/', 'start=/{/ end=/}/ fold', 'start=/(/ end=/)/ containedin=vimFuncBody', 'start=/\[/ end=/\]/ containedin=vimFuncBody', 'start=/{/ end=/}/ fold containedin=vimFuncBody'],
-    \       },
-    \       'html': {
-    \           'parentheses': ['start=/\v\<((area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr)[ >])@!\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'|[^ '."'".'"><=`]*))?)*\>/ end=#</\z1># fold'],
-    \       },
-    \       'css': 0,
-    \   }
-    \}
-" }}}
-
 " Plug Config: treesitter {{{
 if isdirectory(expand(g:NvideConf_PluginDirectory . '/nvim-treesitter'))
 lua <<EOF
@@ -342,6 +316,11 @@ require'nvim-treesitter.configs'.setup {
   },
   refactor = {
     highlight_definitions = { enable = true },
+  },
+  rainbow = {
+    enable = true,
+    extended_mode = false, -- Highlight also non-parentheses delimiters, boolean or table: lang -> boolean
+    max_file_lines = 10000, -- Do not enable for files with more than max_file_lines
   },
   textobjects = {
     move = {

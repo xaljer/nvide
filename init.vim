@@ -203,7 +203,7 @@ Plug 'inkarkat/vim-ingo-library'
 Plug 'inkarkat/vim-mark'
 Plug 'bronson/vim-visual-star-search'
 Plug 'Yggdroot/indentLine'
-Plug 'easymotion/vim-easymotion'
+Plug 'phaazon/hop.nvim'
 Plug 'jiangmiao/auto-pairs'
 Plug 'kshenoy/vim-signature'
 Plug 'terryma/vim-expand-region'
@@ -351,10 +351,6 @@ endif
 let g:indentLine_char = '┆'
 " }}}
 
-" Plug Config: EasyMotion {{{
-let g:EasyMotion_smartcase = 1
-" }}}
-
 " Plug Config: vim-visual-multi {{{
 let g:VM_maps = {}
 let g:VM_maps['Find Under']         = '<M-m>'
@@ -408,6 +404,10 @@ gesture.register({
 EOF
 endif
 " }}}
+
+" Plug Config: gesture.nvim {{{
+nnoremap <Leader><Leader>w :HopWord<cr>
+"}}}
 
 if g:NvideConf_UseIdeFeature == 1
 

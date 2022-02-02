@@ -9,6 +9,7 @@ let g:NvideConf_CxxSemanticHighlight = 0
 let g:Nvide_BuildCmd = "make"
 let g:NvideConf_PythonVirtualEnv = ''
 let g:NvideConf_UseDevIcons = 1
+let g:NvideConf_PluginDirectory = join([stdpath("config"), "plugged"], "/")
 " }}}
 
 " Load user configurations {{{
@@ -181,7 +182,7 @@ if isdirectory(expand(g:NvideConf_PythonVirtualEnv))
 endif
 
 " Install Plugins {{{
-call plug#begin()
+call plug#begin(g:NvideConf_PluginDirectory)
 
 " ========= color themes ==========
 Plug 'vim-airline/vim-airline'
@@ -191,8 +192,6 @@ Plug 'arcticicestudio/nord-vim'
 Plug 'sainnhe/edge'
 
 " ========= language and syntax enhancement ==========
-Plug 'sheerun/vim-polyglot'
-Plug 'ekalinin/Dockerfile.vim', { 'for': 'dockerfile' }
 Plug 'nvim-treesitter/nvim-treesitter'
 Plug 'nvim-treesitter/nvim-treesitter-refactor'
 Plug 'nvim-treesitter/nvim-treesitter-textobjects'
@@ -224,12 +223,7 @@ if g:NvideConf_UseIdeFeature == 1
 " - ripgrep
 " - LSP server (clangd, ccls, ...)
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-
-if has('win32')
-Plug 'Yggdroot/LeaderF', { 'do': '.\install.bat' }
-else
-Plug 'Yggdroot/LeaderF', { 'do': '.\install.sh' }
-endif
+Plug 'Yggdroot/LeaderF', { 'do': ':LeaderfInstallCExtension' }
 Plug 'Yggdroot/LeaderF-marks'
 
 Plug 'tpope/vim-fugitive'
@@ -282,7 +276,7 @@ let g:edge_style = 'neon'
 
 "colorscheme edge
 "colorscheme nord
-colorscheme onedark
+silent! colorscheme onedark
 " }}}
 
 " Plug Config: airline {{{
@@ -338,9 +332,11 @@ let g:rainbow_conf = {
 " }}}
 
 " Plug Config: treesitter {{{
+if isdirectory(expand(g:NvideConf_PluginDirectory . '/nvim-treesitter'))
 lua <<EOF
 require'nvim-treesitter.configs'.setup {
-  ensure_installed = "c",     -- one of "all", "language", or a list of languages
+  -- One of "all", "maintained" (parsers with maintainers), or a list of languages
+  ensure_installed = {"c", "cpp", "bash", "python", "json", "json5", "jsonc", "markdown"},
   highlight = {
     enable = true,            -- false will disable the whole extension
   },
@@ -369,6 +365,7 @@ require'nvim-treesitter.configs'.setup {
   },
 }
 EOF
+endif
 " }}}
 
 " Plug Config: indentLine {{{
@@ -400,15 +397,20 @@ let g:AutoPairsShortcutToggle = ''
 " }}}
 
 " Plug Config: asyncrun {{{
+if isdirectory(expand(g:NvideConf_PluginDirectory . '/asyncrun.vim'))
 let g:asyncrun_open = 12
 let g:asyncrun_rootmarks = ['.svn', '.git', 'build.xml']
 let g:asyncrun_status = ''
+if isdirectory(expand(g:NvideConf_PluginDirectory . '/vim-airline'))
 let g:airline_section_error = airline#section#create_right(['%{g:asyncrun_status}'])
+endif
 nnoremap <A-p> :call asyncrun#quickfix_toggle(9)<cr>
 nnoremap <Leader>m :<C-U><C-R>=printf("AsyncRun -cwd=<root> %s", g:Nvide_BuildCmd)<CR>
+endif
 " }}}
 
 " Plug Config: gesture.nvim {{{
+if isdirectory(expand(g:NvideConf_PluginDirectory . 'gesture.nvim'))
 nnoremap <silent> <RightMouse>   <Nop>
 nnoremap <silent> <RightDrag>    <Cmd>Gesture draw<CR>
 nnoremap <silent> <RightRelease> <Cmd>Gesture finish<CR>
@@ -425,6 +427,7 @@ inputs = { gesture.left() },
 action = [[lua vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-o>", true, false, true), "n", true)]]
 })
 EOF
+endif
 " }}}
 
 if g:NvideConf_UseIdeFeature == 1
@@ -532,6 +535,7 @@ nnoremap <Leader>f: :match Cursor '<C-R><C-W>'<CR> :<C-U><C-R>
 " }}}
 
 " Plug Config: coc.nvim {{{
+if isdirectory(expand(g:NvideConf_PluginDirectory . 'coc.nvim'))
 " Use <TAB> to select the popup menu:
 autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
 
@@ -597,6 +601,7 @@ nmap <C-M-LeftMouse> :call <SID>FindReference()<CR>
 nnoremap <Leader>ca :<C-U>CocCommand cSpell.addWordToDictionary<CR>
 vmap <leader>a <Plug>(coc-codeaction-selected)
 nmap <leader>a <Plug>(coc-codeaction-selected)
+endif
 " }}}
 
 " Plug Config: ALE {{{

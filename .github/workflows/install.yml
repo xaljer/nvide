@@ -1,0 +1,52 @@
+name: install plugins from scratch
+
+on:
+  push:
+    branches: [ main ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  install:
+    runs-on: ubuntu-18.04
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+        with:
+          path: nvim.config/nvim
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt install -y python3 nodejs git gcc
+          sudo pip install -U pip setuptools
+          sudo pip install neovim
+
+      - name: Install neovim and plugins
+        run: |
+          cd $GITHUB_WORKSPACE
+          echo "=========start to install neovim and plug.vim========"
+          curl -fLo nvim --create-dirs https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage
+          chmod u+x nvim
+          curl -fLo nvim.config/nvim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+
+          echo "=========start to install plugins========="
+          ./nvim +PlugInstall +qall --headless
+
+          echo "=========start to install plugins of coc========="
+          mkdir -p nvim.config/coc/extensions
+          cd nvim.config/coc/extensions
+          if [ ! -f package.json ]
+          then
+            echo '{"dependencies":{}}'> package.json
+          fi
+          npm install coc-snippets coc-syntax coc-word coc-pairs coc-lists coc-yank coc-spell-checker coc-json coc-python --global-style --ignore-scripts --no-bin-links --no-package-lock --only=prod
+
+          cd $GITHUB_WORKSPACE
+          tar -czf nvim.config.tar.gz nvim.config/
+
+      - name: Upload output file
+        uses: actions/upload-artifact@v2
+        with:
+          name: nvim.config
+          path: nvim.config.tar.gz

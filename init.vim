@@ -10,6 +10,8 @@ let g:Nvide_BuildCmd = "make"
 let g:NvideConf_PythonVirtualEnv = ''
 let g:NvideConf_UseDevIcons = 1
 let g:NvideConf_PluginDirectory = join([stdpath("config"), "plugged"], "/")
+" default or set to some mirror like: 'https://github.com.cnpmjs.org/'
+let g:NvideConf_PluginDownloadAddr = ''
 " }}}
 
 " Load user configurations {{{
@@ -185,34 +187,34 @@ endif
 call plug#begin(g:NvideConf_PluginDirectory)
 
 " ========= color themes ==========
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
-Plug 'joshdick/onedark.vim'
-Plug 'arcticicestudio/nord-vim'
-Plug 'sainnhe/edge'
+Plug g:NvideConf_PluginDownloadAddr . 'vim-airline/vim-airline'
+Plug g:NvideConf_PluginDownloadAddr . 'vim-airline/vim-airline-themes'
+Plug g:NvideConf_PluginDownloadAddr . 'joshdick/onedark.vim'
+Plug g:NvideConf_PluginDownloadAddr . 'arcticicestudio/nord-vim'
+Plug g:NvideConf_PluginDownloadAddr . 'sainnhe/edge'
 
 " ========= language and syntax enhancement ==========
-Plug 'nvim-treesitter/nvim-treesitter'
-Plug 'nvim-treesitter/nvim-treesitter-refactor'
-Plug 'nvim-treesitter/nvim-treesitter-textobjects'
-Plug 'romgrk/nvim-treesitter-context'
-Plug 'p00f/nvim-ts-rainbow'
+Plug g:NvideConf_PluginDownloadAddr . 'nvim-treesitter/nvim-treesitter'
+Plug g:NvideConf_PluginDownloadAddr . 'nvim-treesitter/nvim-treesitter-refactor'
+Plug g:NvideConf_PluginDownloadAddr . 'nvim-treesitter/nvim-treesitter-textobjects'
+Plug g:NvideConf_PluginDownloadAddr . 'romgrk/nvim-treesitter-context'
+Plug g:NvideConf_PluginDownloadAddr . 'p00f/nvim-ts-rainbow'
 
 " ========= edit enhancement ==========
-Plug 'inkarkat/vim-ingo-library'
-Plug 'inkarkat/vim-mark'
-Plug 'bronson/vim-visual-star-search'
-Plug 'Yggdroot/indentLine'
-Plug 'phaazon/hop.nvim'
-Plug 'jiangmiao/auto-pairs'
-Plug 'kshenoy/vim-signature'
-Plug 'terryma/vim-expand-region'
-Plug 'dhruvasagar/vim-table-mode'
-Plug 'mg979/vim-visual-multi'
-Plug 'junegunn/vim-easy-align'
-Plug 'tpope/vim-surround'
-Plug 'AndrewRadev/linediff.vim'
-Plug 'notomo/gesture.nvim'
+Plug g:NvideConf_PluginDownloadAddr . 'inkarkat/vim-ingo-library'
+Plug g:NvideConf_PluginDownloadAddr . 'inkarkat/vim-mark'
+Plug g:NvideConf_PluginDownloadAddr . 'bronson/vim-visual-star-search'
+Plug g:NvideConf_PluginDownloadAddr . 'Yggdroot/indentLine'
+Plug g:NvideConf_PluginDownloadAddr . 'phaazon/hop.nvim'
+Plug g:NvideConf_PluginDownloadAddr . 'jiangmiao/auto-pairs'
+Plug g:NvideConf_PluginDownloadAddr . 'kshenoy/vim-signature'
+Plug g:NvideConf_PluginDownloadAddr . 'terryma/vim-expand-region'
+Plug g:NvideConf_PluginDownloadAddr . 'dhruvasagar/vim-table-mode'
+Plug g:NvideConf_PluginDownloadAddr . 'mg979/vim-visual-multi'
+Plug g:NvideConf_PluginDownloadAddr . 'junegunn/vim-easy-align'
+Plug g:NvideConf_PluginDownloadAddr . 'tpope/vim-surround'
+Plug g:NvideConf_PluginDownloadAddr . 'AndrewRadev/linediff.vim'
+Plug g:NvideConf_PluginDownloadAddr . 'notomo/gesture.nvim'
 
 if g:NvideConf_UseIdeFeature == 1
 " ========= IDE features ==========
@@ -222,23 +224,23 @@ if g:NvideConf_UseIdeFeature == 1
 " - ctags, gtags
 " - ripgrep
 " - LSP server (clangd, ccls, ...)
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-Plug 'Yggdroot/LeaderF', { 'do': ':LeaderfInstallCExtension' }
-Plug 'Yggdroot/LeaderF-marks'
+Plug g:NvideConf_PluginDownloadAddr . 'neoclide/coc.nvim', {'branch': 'release'}
+Plug g:NvideConf_PluginDownloadAddr . 'Yggdroot/LeaderF', { 'do': ':LeaderfInstallCExtension' }
+Plug g:NvideConf_PluginDownloadAddr . 'Yggdroot/LeaderF-marks'
 
-Plug 'tpope/vim-fugitive'
-Plug 'airblade/vim-gitgutter'
-Plug 'rhysd/git-messenger.vim'
-Plug 'f-person/git-blame.nvim'
-Plug 'skywind3000/asyncrun.vim'
-Plug 'w0rp/ale'
-Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeVCS'] }
+Plug g:NvideConf_PluginDownloadAddr . 'tpope/vim-fugitive'
+Plug g:NvideConf_PluginDownloadAddr . 'airblade/vim-gitgutter'
+Plug g:NvideConf_PluginDownloadAddr . 'rhysd/git-messenger.vim'
+Plug g:NvideConf_PluginDownloadAddr . 'f-person/git-blame.nvim'
+Plug g:NvideConf_PluginDownloadAddr . 'skywind3000/asyncrun.vim'
+Plug g:NvideConf_PluginDownloadAddr . 'w0rp/ale'
+Plug g:NvideConf_PluginDownloadAddr . 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeVCS'] }
 
 if g:NvideConf_UseDevIcons == 1
-Plug 'ryanoasis/vim-devicons'
+Plug g:NvideConf_PluginDownloadAddr . 'ryanoasis/vim-devicons'
 endif
 if g:NvideConf_CxxSemanticHighlight == 1
-Plug 'jackguo380/vim-lsp-cxx-highlight', { 'for': ['c', 'cpp'] }
+Plug g:NvideConf_PluginDownloadAddr . 'jackguo380/vim-lsp-cxx-highlight', { 'for': ['c', 'cpp'] }
 endif
 call plug#end()
 
@@ -310,7 +312,7 @@ if isdirectory(expand(g:NvideConf_PluginDirectory . '/nvim-treesitter'))
 lua <<EOF
 require'nvim-treesitter.configs'.setup {
   -- One of "all", "maintained" (parsers with maintainers), or a list of languages
-  ensure_installed = {"c", "cpp", "bash", "python", "json", "json5", "jsonc", "markdown"},
+  ensure_installed = {"c", "cpp", "bash", "python", "json", "jsonc"},
   highlight = {
     enable = true,            -- false will disable the whole extension
   },

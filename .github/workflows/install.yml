@@ -33,6 +33,9 @@ jobs:
           echo "=========start to install plugins========="
           ./nvim +PlugInstall +qall --headless
 
+          echo "=========start to install plugins of tree-sitter========="
+          ./nvim +"TSInstallSync maintained" +qall --headless
+
           echo "=========start to install plugins of coc========="
           mkdir -p nvim.config/coc/extensions
           cd nvim.config/coc/extensions

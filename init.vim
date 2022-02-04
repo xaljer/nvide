@@ -9,7 +9,7 @@ let g:NvideConf_CxxSemanticHighlight = 0
 let g:Nvide_BuildCmd = "make"
 let g:NvideConf_PythonVirtualEnv = ''
 let g:NvideConf_UseDevIcons = 1
-let g:NvideConf_PluginDirectory = join([stdpath("config"), "plugged"], "/")
+let g:NvideConf_PluginDirectory = join([stdpath("config"), "plugged/"], "/")
 " default or set to some mirror like: 'https://github.com.cnpmjs.org/'
 let g:NvideConf_PluginDownloadAddr = ''
 " }}}
@@ -229,7 +229,8 @@ Plug g:NvideConf_PluginDownloadAddr . 'Yggdroot/LeaderF', { 'do': ':LeaderfInsta
 Plug g:NvideConf_PluginDownloadAddr . 'Yggdroot/LeaderF-marks'
 
 Plug g:NvideConf_PluginDownloadAddr . 'tpope/vim-fugitive'
-Plug g:NvideConf_PluginDownloadAddr . 'airblade/vim-gitgutter'
+Plug g:NvideConf_PluginDownloadAddr . 'nvim-lua/plenary.nvim'
+Plug g:NvideConf_PluginDownloadAddr . 'lewis6991/gitsigns.nvim'
 Plug g:NvideConf_PluginDownloadAddr . 'rhysd/git-messenger.vim'
 Plug g:NvideConf_PluginDownloadAddr . 'f-person/git-blame.nvim'
 Plug g:NvideConf_PluginDownloadAddr . 'skywind3000/asyncrun.vim'
@@ -308,7 +309,7 @@ nmap <A-b>      <Plug>MarkSearchGroupPrev
 " }}}
 
 " Plug Config: treesitter {{{
-if isdirectory(expand(g:NvideConf_PluginDirectory . '/nvim-treesitter'))
+if isdirectory(expand(g:NvideConf_PluginDirectory . 'nvim-treesitter'))
 lua <<EOF
 require'nvim-treesitter.configs'.setup {
   -- One of "all", "maintained" (parsers with maintainers), or a list of languages
@@ -375,11 +376,11 @@ let g:AutoPairsShortcutToggle = ''
 " }}}
 
 " Plug Config: asyncrun {{{
-if isdirectory(expand(g:NvideConf_PluginDirectory . '/asyncrun.vim'))
+if isdirectory(expand(g:NvideConf_PluginDirectory . 'asyncrun.vim'))
 let g:asyncrun_open = 12
 let g:asyncrun_rootmarks = ['.svn', '.git', 'build.xml']
 let g:asyncrun_status = ''
-if isdirectory(expand(g:NvideConf_PluginDirectory . '/vim-airline'))
+if isdirectory(expand(g:NvideConf_PluginDirectory . 'vim-airline'))
 let g:airline_section_error = airline#section#create_right(['%{g:asyncrun_status}'])
 endif
 nnoremap <A-p> :call asyncrun#quickfix_toggle(9)<cr>
@@ -414,24 +415,38 @@ nnoremap <Leader><Leader>w :HopWord<cr>
 
 if g:NvideConf_UseIdeFeature == 1
 
-" Plug Config: vim-gitgutter {{{
-let g:gitgutter_signs = 0
-nmap gs <Plug>(GitGutterStageHunk)
-nmap gS <Plug>(GitGutterUndoHunk)
-xmap gs <Plug>(GitGutterStageHunk)
-xmap gS <Plug>(GitGutterUndoHunk)
-nmap <Leader>gp <Plug>(GitGutterPreviewHunk)
-nmap <Leader>gf :GitGutterFold<CR>
+" Plug Config: gitsigns.nvim {{{
+if isdirectory(expand(g:NvideConf_PluginDirectory . 'gitsigns.nvim'))
+lua << EOF
+require('gitsigns').setup{
+  on_attach = function(bufnr)
+    local gs = package.loaded.gitsigns
 
-function! GitGutterNextHunkCycle()
-  let line = line('.')
-  silent! GitGutterNextHunk
-  if line('.') == line
-    1
-    GitGutterNextHunk
-  endif
-endfunction
-nmap ]c :call GitGutterNextHunkCycle()<CR>
+    local function map(mode, l, r, opts)
+      opts = opts or {}
+      opts.buffer = bufnr
+      vim.keymap.set(mode, l, r, opts)
+    end
+
+    -- Navigation
+    map('n', ']c', "&diff ? ']c' : '<cmd>Gitsigns next_hunk<CR>'", {expr=true})
+    map('n', '[c', "&diff ? '[c' : '<cmd>Gitsigns prev_hunk<CR>'", {expr=true})
+
+    -- Actions
+    map({'n', 'v'}, 'gs', ':Gitsigns stage_hunk<CR>')
+    map({'n', 'v'}, 'gS', ':Gitsigns reset_hunk<CR>')
+    map('n', '<leader>gu', gs.undo_stage_hunk)
+    map('n', '<leader>gp', gs.preview_hunk)
+    map('n', '<leader>gd', gs.diffthis)
+    map('n', '<leader>gD', function() gs.diffthis('~') end)
+    map('n', '<leader>td', gs.toggle_deleted)
+
+    -- Text object
+    map({'o', 'x'}, 'ih', ':<C-U>Gitsigns select_hunk<CR>')
+  end
+}
+EOF
+endif
 " }}}
 
 " Plug Config: git-blame.nvim {{{

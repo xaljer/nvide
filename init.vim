@@ -204,7 +204,7 @@ Plug g:NvideConf_PluginDownloadAddr . 'p00f/nvim-ts-rainbow'
 Plug g:NvideConf_PluginDownloadAddr . 'inkarkat/vim-ingo-library'
 Plug g:NvideConf_PluginDownloadAddr . 'inkarkat/vim-mark'
 Plug g:NvideConf_PluginDownloadAddr . 'bronson/vim-visual-star-search'
-Plug g:NvideConf_PluginDownloadAddr . 'Yggdroot/indentLine'
+Plug g:NvideConf_PluginDownloadAddr . 'lukas-reineke/indent-blankline.nvim'
 Plug g:NvideConf_PluginDownloadAddr . 'phaazon/hop.nvim'
 Plug g:NvideConf_PluginDownloadAddr . 'jiangmiao/auto-pairs'
 Plug g:NvideConf_PluginDownloadAddr . 'kshenoy/vim-signature'
@@ -349,8 +349,9 @@ EOF
 endif
 " }}}
 
-" Plug Config: indentLine {{{
-let g:indentLine_char = '┆'
+" Plug Config: indent-blankline {{{
+let g:indent_blankline_use_treesitter = v:true
+let g:indent_blankline_show_current_context = v:true
 " }}}
 
 " Plug Config: vim-visual-multi {{{
@@ -407,7 +408,7 @@ EOF
 endif
 " }}}
 
-" Plug Config: gesture.nvim {{{
+" Plug Config: hop.nvim {{{
 nnoremap <Leader><Leader>w :HopWord<cr>
 "}}}
 

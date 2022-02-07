@@ -109,6 +109,10 @@ au FocusLost,WinLeave * :silent! noautocmd w
 autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 " }}}
 
+" Utility {{{
+command RmCr %s///g
+" }}}
+
 " Key binding {{{
 let mapleader = ' '
 
@@ -235,7 +239,7 @@ Plug g:NvideConf_PluginDownloadAddr . 'rhysd/git-messenger.vim'
 Plug g:NvideConf_PluginDownloadAddr . 'f-person/git-blame.nvim'
 Plug g:NvideConf_PluginDownloadAddr . 'skywind3000/asyncrun.vim'
 Plug g:NvideConf_PluginDownloadAddr . 'w0rp/ale'
-Plug g:NvideConf_PluginDownloadAddr . 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeVCS'] }
+Plug g:NvideConf_PluginDownloadAddr . 'scrooloose/nerdtree', { 'on': ['NERDTree', 'NERDTreeToggle', 'NERDTreeVCS'] }
 
 if g:NvideConf_UseDevIcons == 1
 Plug g:NvideConf_PluginDownloadAddr . 'ryanoasis/vim-devicons'
@@ -305,7 +309,7 @@ xmap <Leader>h  <Plug>MarkSet
 nmap <Leader>H  <Plug>MarkAllClear
 nmap <Leader>/  <Plug>MarkRegex
 nmap <A-n>      <Plug>MarkSearchGroupNext
-nmap <A-b>      <Plug>MarkSearchGroupPrev
+nmap <A-N>      <Plug>MarkSearchGroupPrev
 " }}}
 
 " Plug Config: treesitter {{{
@@ -347,6 +351,9 @@ require'nvim-treesitter.configs'.setup {
   },
 }
 EOF
+set foldmethod=expr
+set foldexpr=nvim_treesitter#foldexpr()
+set nofoldenable
 endif
 " }}}
 
@@ -410,7 +417,14 @@ endif
 " }}}
 
 " Plug Config: hop.nvim {{{
+if isdirectory(expand(g:NvideConf_PluginDirectory . 'hop.nvim'))
+lua << EOF
+require'hop'.setup()
+EOF
 nnoremap <Leader><Leader>w :HopWord<cr>
+nnoremap <Leader>j         :HopChar1<cr>
+nnoremap <Leader>/         :HopPattern<cr>
+endif
 "}}}
 
 if g:NvideConf_UseIdeFeature == 1
@@ -460,6 +474,7 @@ let g:git_messenger_date_format = '%Y-%m-%d %H:%M %z'
 
 " Plug Config: NerdTree {{{
 nnoremap <Leader>e :NERDTreeToggle<CR>
+nnoremap <Leader>l :NERDTree %<CR>
 nnoremap <Leader>E :NERDTreeVCS <C-R>=expand('%:p:h')<CR><CR>
 " }}}
 
@@ -475,7 +490,7 @@ let g:Lf_WindowHeight = 0.31
 let g:Lf_HideHelp = 1
 let g:Lf_IgnoreCurrentBufferName = 1
 let g:Lf_CacheDirectory = expand('~/.vim/cache')
-let g:Lf_NumberOfCache = 30
+let g:Lf_NumberOfCache = 50
 let g:Lf_NeedCacheTime = 1
 let g:Lf_ShowRelativePath = 1
 let g:Lf_DefaultMode = 'NameOnly'
@@ -485,8 +500,11 @@ let g:Lf_PreviewCode = 1
 let g:Lf_PopupWidth = 0.85
 let g:Lf_PopupHeight = 0.5
 let g:Lf_GtagsAutoGenerate = 0
+let g:Lf_GtagsSkipSymlink = 'f'
+let g:Lf_GtagsSkipUnreadable = 1
 let g:Lf_Gtagsconf = expand('~/gtags.conf')
 let g:Lf_ShortcutF = '<C-P>'
+let g:Lf_DiscardEmptyBuffer = 1
 let g:Lf_NormalMap = {
     \ "File":   [["<ESC>", ':exec g:Lf_py "fileExplManager.quit()"<CR>']],
     \ "Buffer": [["<ESC>", ':exec g:Lf_py "bufExplManager.quit()"<CR>']],

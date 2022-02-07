@@ -19,7 +19,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt install -y python3 nodejs git gcc
+          sudo apt install -y python3 python3-dev nodejs git gcc
           sudo pip install -U pip setuptools
           sudo pip install neovim
 
@@ -33,6 +33,10 @@ jobs:
 
           echo "=========start to install plugins========="
           ./nvim +PlugInstall +qall --headless
+
+          cd nvim.config/nvim/plugged/LeaderF/
+          ./install.sh
+          cd $GITHUB_WORKSPACE
 
           echo "=========start to install plugins of tree-sitter========="
           ./nvim +"TSInstallSync maintained" +qall --headless

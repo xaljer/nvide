@@ -61,7 +61,6 @@ set laststatus=2
 set scrolloff=6
 set noshowmode             " no need to show mode when use airline/lightline
 set showcmd                " Show already typed keys when more are expected.
-set updatetime=150         " make virtual text real-time update
 
 set incsearch              " Highlight while searching with / or ?.
 set hlsearch               " Keep matches highlighted.

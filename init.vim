@@ -174,6 +174,11 @@ nnoremap <Leader>v :<C-U><C-R>=printf("Rg -e %s ", expand("<cword>"))<CR>
 nnoremap <Leader>gc /^>>>>>>>\\|^<<<<<<<\\|^=======$<CR>
 
 nmap <M-LeftMouse>  *
+
+" search in last selection
+nnoremap <Leader>/ /\%V
+nnoremap <Leader>* /<C-U><C-R>='\%V' . '\<' . expand('<cword>') . '\>'<CR><CR>
+nnoremap <Leader># ?<C-U><C-R>='\%V' . '\<' . expand('<cword>') . '\>'<CR><CR>
 " }}}
 
 if g:NvideConf_UsePlugin == 1
@@ -306,7 +311,6 @@ let g:mw_no_mappings = 1
 nmap <Leader>h  <Plug>MarkSet
 xmap <Leader>h  <Plug>MarkSet
 nmap <Leader>H  <Plug>MarkAllClear
-nmap <Leader>/  <Plug>MarkRegex
 nmap <A-n>      <Plug>MarkSearchGroupNext
 nmap <A-N>      <Plug>MarkSearchGroupPrev
 " }}}
@@ -420,9 +424,9 @@ if isdirectory(expand(g:NvideConf_PluginDirectory . 'hop.nvim'))
 lua << EOF
 require'hop'.setup()
 EOF
-nnoremap <Leader><Leader>w :HopWord<cr>
+nnoremap <Leader><Leader>  :HopWord<cr>
 nnoremap <Leader>j         :HopChar1<cr>
-nnoremap <Leader>/         :HopPattern<cr>
+nnoremap g/                :HopPattern<cr>
 endif
 "}}}
 

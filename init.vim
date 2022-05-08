@@ -205,7 +205,7 @@ Plug g:NvideConf_PluginDownloadAddr . 'sainnhe/edge'
 Plug g:NvideConf_PluginDownloadAddr . 'nvim-treesitter/nvim-treesitter'
 Plug g:NvideConf_PluginDownloadAddr . 'nvim-treesitter/nvim-treesitter-refactor'
 Plug g:NvideConf_PluginDownloadAddr . 'nvim-treesitter/nvim-treesitter-textobjects'
-Plug g:NvideConf_PluginDownloadAddr . 'romgrk/nvim-treesitter-context'
+Plug g:NvideConf_PluginDownloadAddr . 'lewis6991/nvim-treesitter-context'
 Plug g:NvideConf_PluginDownloadAddr . 'p00f/nvim-ts-rainbow'
 
 " ========= edit enhancement ==========
@@ -330,16 +330,18 @@ require'nvim-treesitter.configs'.setup {
   rainbow = {
     enable = true,
     extended_mode = false, -- Highlight also non-parentheses delimiters, boolean or table: lang -> boolean
-    max_file_lines = 10000, -- Do not enable for files with more than max_file_lines
+    max_file_lines = 15000, -- Do not enable for files with more than max_file_lines
   },
   textobjects = {
     move = {
       enable = true,
       goto_next_start = {
         ["]m"] = "@function.outer",
+        ["]s"] = "@class.outer",
       },
       goto_previous_start = {
         ["[m"] = "@function.outer",
+        ["[s"] = "@class.outer",
       },
     },
     swap = {
@@ -357,6 +359,36 @@ EOF
 set foldmethod=expr
 set foldexpr=nvim_treesitter#foldexpr()
 set nofoldenable
+endif
+" }}}
+
+" Plug Config: treesitter-context {{{
+if isdirectory(expand(g:NvideConf_PluginDirectory . 'nvim-treesitter-context'))
+lua <<EOF
+require'treesitter-context'.setup{
+    enable = true,   -- Enable this plugin (Can be enabled/disabled later via commands)
+    throttle = true, -- Throttles plugin updates (may improve performance)
+    max_lines = 50,  -- How many lines the window should span. Values <= 0 mean no limit.
+    patterns = { -- Match patterns for TS nodes. These get wrapped to match at word boundaries.
+        -- For all filetypes
+        -- Note that setting an entry here replaces all other patterns for this entry.
+        -- By setting the 'default' entry below, you can control which nodes you want to
+        -- appear in the context window.
+        default = {
+            'class',
+            'function',
+            'method',
+            'struct',
+            'enum',
+            'for',
+            'while',
+            'if',
+            'switch',
+            'case',
+        },
+    },
+}
+EOF
 endif
 " }}}
 

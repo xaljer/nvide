@@ -38,8 +38,8 @@ jobs:
           ./install.sh
           cd $GITHUB_WORKSPACE
 
-          echo "=========start to install plugins of tree-sitter========="
-          ./nvim +"TSInstallSync maintained" +qall --headless
+          echo "=========start to install parsers of tree-sitter========="
+          ./nvim +"TSInstallSync all" +qall --headless
 
           echo "=========start to install plugins of coc========="
           mkdir -p nvim.config/coc/extensions

@@ -199,6 +199,7 @@ Plug g:NvideConf_PluginDownloadAddr . 'vim-airline/vim-airline'
 Plug g:NvideConf_PluginDownloadAddr . 'vim-airline/vim-airline-themes'
 Plug g:NvideConf_PluginDownloadAddr . 'joshdick/onedark.vim'
 Plug g:NvideConf_PluginDownloadAddr . 'arcticicestudio/nord-vim'
+Plug g:NvideConf_PluginDownloadAddr . 'rmehri01/onenord.nvim', { 'branch': 'main' }
 Plug g:NvideConf_PluginDownloadAddr . 'sainnhe/edge'
 
 " ========= language and syntax enhancement ==========
@@ -223,6 +224,7 @@ Plug g:NvideConf_PluginDownloadAddr . 'junegunn/vim-easy-align'
 Plug g:NvideConf_PluginDownloadAddr . 'tpope/vim-surround'
 Plug g:NvideConf_PluginDownloadAddr . 'AndrewRadev/linediff.vim'
 Plug g:NvideConf_PluginDownloadAddr . 'notomo/gesture.nvim'
+Plug g:NvideConf_PluginDownloadAddr . 'numToStr/Comment.nvim'
 
 if g:NvideConf_UseIdeFeature == 1
 " ========= IDE features ==========
@@ -287,7 +289,8 @@ let g:edge_style = 'neon'
 
 "colorscheme edge
 "colorscheme nord
-silent! colorscheme onedark
+colorscheme onenord
+"silent! colorscheme onedark
 " }}}
 
 " Plug Config: airline {{{
@@ -313,6 +316,10 @@ xmap <Leader>h  <Plug>MarkSet
 nmap <Leader>H  <Plug>MarkAllClear
 nmap <A-n>      <Plug>MarkSearchGroupNext
 nmap <A-N>      <Plug>MarkSearchGroupPrev
+" }}}
+
+" Plug Config: Comment.nvim {{{
+lua require('Comment').setup()
 " }}}
 
 " Plug Config: treesitter {{{

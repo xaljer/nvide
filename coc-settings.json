@@ -4,8 +4,7 @@
     "suggest.minTriggerInputLength": 2,
 
     "codeLens.enable": false,
-    "coc.preferences.colorSupport": true,
-    "diagnostic.displayByAle": true,
+    "diagnostic.displayByAle": false,
 
     "coc.source.syntax.enable": true,
     "coc.source.word.enable": true,
@@ -42,21 +41,26 @@
     "cSpell.spellCheckDelayMs": 50,
 
     "languageserver": {
-        "ccls": {
-            "command": "ccls",
-            "filetypes": ["c", "cpp", "objc", "objcpp"],
-            "rootPatterns": [".ccls", "compile_commands.json", ".git/", ".hg/"],
-            "initializationOptions": {
-                "cache": {
-                    "directory": ".cache/ccls"
-                },
-                "highlight": { "lsRanges" : true }
-            }
-        },
         "clangd": {
             "command": "clangd",
             "rootPatterns": ["compile_flags.txt", "compile_commands.json", ".repo/", ".git/", ".hg/"],
-            "filetypes": ["c", "cpp", "objc", "objcpp"]
+            "filetypes": ["c", "cpp", "objc", "objcpp"],
+            "args": [
+                "--all-scopes-completion",
+                "--index",
+                "--background-index",
+                "recovery-ast",
+                "--cross-file-rename",
+                "--completion-style=detailed",
+                "--compile_args_from=filesystem",
+                "--fallback-style=llvm",
+                "--function-arg-placeholders",
+                "--header-insertion=never",
+                "--pch-storage=memory",
+                "--limit-results=80",
+                "--suggest-missing-includes",
+                "--hidden-features"
+            ]
         }
      }
 }

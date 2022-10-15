@@ -48,7 +48,7 @@ jobs:
           then
             echo '{"dependencies":{}}'> package.json
           fi
-          npm install coc-snippets coc-syntax coc-word coc-pairs coc-lists coc-yank coc-spell-checker coc-json coc-python --global-style --ignore-scripts --no-bin-links --no-package-lock --only=prod
+          npm install coc-snippets coc-syntax coc-word coc-pairs coc-lists coc-yank coc-spell-checker coc-json coc-python coc-vimlsp --global-style --ignore-scripts --no-bin-links --no-package-lock --only=prod
 
           cd $GITHUB_WORKSPACE
           tar -czf nvim.config.tar.gz nvim.config/

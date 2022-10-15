@@ -19,7 +19,7 @@ syn match log_notice        '[\+\-\=\*\#]\{6,}'
 syn match log_warning       '\c.*\<\(WARN\|TIMEOUT\|KILL\|NULL\|UNKNOWN\|UNSUPPORT\(ED\)\?\|INVALID\|ILLEGAL\|ABNORMAL\).*'
 syn match log_warning       '^\[\d\{8}\]\[W\].*'
 syn match log_error         '\c.*\<\(ERR[^NO]\|ERROR\|FAIL\|FAILED\|FAILURE\|FAULT\|FATAL\).*'
-syn match log_error         '\c.*\<\(exception\|Oops\|crash\|assert\|panic\|NG\).*'
+syn match log_error         '\c.*\<\(exception\|Oops\|crash\|assert\|panic\|lowmemorykiller\|NG\).*'
 syn match log_error         '^\[\d\{8}\]\[E\].*'
 syn match log_ok            '\c.*\<\(OK\|PASSED\|SUCCESS\|SUCCESSFUL\|SUCCEED\).*'
 

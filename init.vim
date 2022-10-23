@@ -206,7 +206,7 @@ Plug g:NvideConf_PluginDownloadAddr . 'sainnhe/edge'
 Plug g:NvideConf_PluginDownloadAddr . 'nvim-treesitter/nvim-treesitter'
 Plug g:NvideConf_PluginDownloadAddr . 'nvim-treesitter/nvim-treesitter-refactor'
 Plug g:NvideConf_PluginDownloadAddr . 'nvim-treesitter/nvim-treesitter-textobjects'
-Plug g:NvideConf_PluginDownloadAddr . 'lewis6991/nvim-treesitter-context'
+Plug g:NvideConf_PluginDownloadAddr . 'nvim-treesitter/nvim-treesitter-context'
 Plug g:NvideConf_PluginDownloadAddr . 'p00f/nvim-ts-rainbow'
 
 " ========= edit enhancement ==========
@@ -485,8 +485,17 @@ require('gitsigns').setup{
     end
 
     -- Navigation
-    map('n', ']c', "&diff ? ']c' : '<cmd>Gitsigns next_hunk<CR>'", {expr=true})
-    map('n', '[c', "&diff ? '[c' : '<cmd>Gitsigns prev_hunk<CR>'", {expr=true})
+    map('n', ']c', function()
+      if vim.wo.diff then return ']c' end
+      vim.schedule(function() gs.next_hunk() end)
+      return '<Ignore>'
+    end, {expr=true})
+
+    map('n', '[c', function()
+      if vim.wo.diff then return '[c' end
+      vim.schedule(function() gs.prev_hunk() end)
+      return '<Ignore>'
+    end, {expr=true})
 
     -- Actions
     map({'n', 'v'}, 'gs', ':Gitsigns stage_hunk<CR>')

@@ -564,6 +564,11 @@ let g:Lf_NormalMap = {
     \ "Function":    [["<ESC>", ':exec g:Lf_py "functionExplManager.quit()"<CR>']],
     \ "Colorscheme":    [["<ESC>", ':exec g:Lf_py "colorschemeExplManager.quit()"<CR>']],
     \ }
+let g:Lf_CtagsFuncOpts = {
+    \ 'c': '--c-kinds=fs',
+    \ 'cpp': '--c++-kinds=fc',
+    \ 'rust': '--rust-kinds=f',
+    \ }
 
 nnoremap <M-r>      :<C-U>Leaderf --recall<CR>
 nnoremap <M-o>      :<C-U>Leaderf --next<CR>

@@ -607,22 +607,28 @@ nnoremap <Leader>f: :match Cursor '<C-R><C-W>'<CR> :<C-U><C-R>
 
 " Plug Config: coc.nvim {{{
 if isdirectory(expand(g:NvideConf_PluginDirectory . 'coc.nvim'))
-" Use <TAB> to select the popup menu:
-autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
 
-function! s:check_back_space() abort
-    let col = col('.') - 1
-    return !col || getline('.')[col - 1]  =~# '\s'
-endfunction
+" Use <c-space> to trigger completion.
+if has('nvim')
+  inoremap <silent><expr> <c-space> coc#refresh()
+else
+  inoremap <silent><expr> <c-@> coc#refresh()
+endif
 
 " Make <CR> auto-select the first completion item and notify coc.nvim to
 " format on enter, <cr> could be remapped by other vim plugin
 inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm() :
     \ "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>""
 
-inoremap <silent><expr> <TAB>  pumvisible() ? coc#_select_confirm() :
-    \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
-    \ <SID>check_back_space() ? "\<TAB>" : coc#refresh()
+function! CheckBackspace() abort
+    let col = col('.') - 1
+    return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+inoremap <silent><expr> <TAB>
+      \ coc#pum#visible() ? coc#_select_confirm() :
+      \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
+      \ CheckBackspace() ? "\<TAB>" : coc#refresh()
 let g:coc_snippet_next = '<tab>'
 
 function! s:GoToDefinition()

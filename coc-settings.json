@@ -49,7 +49,7 @@
                 "--all-scopes-completion",
                 "--index",
                 "--background-index",
-                "recovery-ast",
+                "--recovery-ast",
                 "--cross-file-rename",
                 "--completion-style=detailed",
                 "--compile_args_from=filesystem",

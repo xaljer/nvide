@@ -244,7 +244,8 @@ Plug g:NvideConf_PluginDownloadAddr . 'lewis6991/gitsigns.nvim'
 Plug g:NvideConf_PluginDownloadAddr . 'rhysd/git-messenger.vim'
 Plug g:NvideConf_PluginDownloadAddr . 'f-person/git-blame.nvim'
 Plug g:NvideConf_PluginDownloadAddr . 'skywind3000/asyncrun.vim'
-Plug g:NvideConf_PluginDownloadAddr . 'w0rp/ale'
+Plug g:NvideConf_PluginDownloadAddr . 'kevinhwang91/promise-async'
+Plug g:NvideConf_PluginDownloadAddr . 'kevinhwang91/nvim-ufo'
 Plug g:NvideConf_PluginDownloadAddr . 'scrooloose/nerdtree', { 'on': ['NERDTree', 'NERDTreeToggle', 'NERDTreeVCS'] }
 
 if g:NvideConf_UseDevIcons == 1
@@ -363,9 +364,6 @@ require'nvim-treesitter.configs'.setup {
   },
 }
 EOF
-set foldmethod=expr
-set foldexpr=nvim_treesitter#foldexpr()
-set nofoldenable
 endif
 " }}}
 
@@ -676,21 +674,30 @@ nmap <leader>a <Plug>(coc-codeaction-selected)
 endif
 " }}}
 
-" Plug Config: ALE {{{
-let g:ale_linters_explicit = 1
-let g:ale_echo_delay = 20
-let g:ale_lint_delay = 500
-let g:ale_echo_msg_format = '[%linter%] %code: %%s'
-let g:ale_lint_on_save = 1
-let g:ale_lint_on_enter = 1
-let g:ale_lint_on_insert_leave = 1
-let g:ale_lint_on_text_changed = 'normal'
-let g:ale_linters = {
-\   'cpp': ['clangtidy'],
-\   'c': ['clangtidy'],
-\   'python': ['pylint'],
-\}
-" }}}
+" Plug Config: ufo {{{
+lua << EOF
+vim.o.foldcolumn = '1' -- '0' is not bad
+vim.o.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
+vim.o.foldlevelstart = 99
+vim.o.foldenable = true
+
+-- Using ufo provider need remap `zR` and `zM`. If Neovim is 0.6.1, remap yourself
+vim.keymap.set('n', 'zR', require('ufo').openAllFolds)
+vim.keymap.set('n', 'zM', require('ufo').closeAllFolds)
+
+-- Option 2: coc as a main provider instead
+-- require('ufo').setup()
+
+-- Option 3: treesitter as a main provider instead
+-- Only depend on `nvim-treesitter/queries/filetype/folds.scm`,
+-- performance and stability are better than `foldmethod=nvim_treesitter#foldexpr()`
+require('ufo').setup({
+    provider_selector = function(bufnr, filetype, buftype)
+        return {'treesitter', 'indent'}
+    end
+})
+EOF
+"}}}
 
 endif " g:NvideConf_UseIdeFeature
 

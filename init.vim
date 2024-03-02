@@ -207,7 +207,7 @@ Plug g:NvideConf_PluginDownloadAddr . 'nvim-treesitter/nvim-treesitter'
 Plug g:NvideConf_PluginDownloadAddr . 'nvim-treesitter/nvim-treesitter-refactor'
 Plug g:NvideConf_PluginDownloadAddr . 'nvim-treesitter/nvim-treesitter-textobjects'
 Plug g:NvideConf_PluginDownloadAddr . 'nvim-treesitter/nvim-treesitter-context'
-Plug g:NvideConf_PluginDownloadAddr . 'p00f/nvim-ts-rainbow'
+Plug g:NvideConf_PluginDownloadAddr . 'HiPhish/rainbow-delimiters.nvim'
 
 " ========= edit enhancement ==========
 Plug g:NvideConf_PluginDownloadAddr . 'inkarkat/vim-ingo-library'
@@ -335,11 +335,6 @@ require'nvim-treesitter.configs'.setup {
   refactor = {
     highlight_definitions = { enable = true },
   },
-  rainbow = {
-    enable = true,
-    extended_mode = false, -- Highlight also non-parentheses delimiters, boolean or table: lang -> boolean
-    max_file_lines = 15000, -- Do not enable for files with more than max_file_lines
-  },
   textobjects = {
     move = {
       enable = true,
@@ -395,6 +390,32 @@ require'treesitter-context'.setup{
 }
 EOF
 endif
+" }}}
+
+" Plug Config: rainbow_delimiters {{{
+let g:rainbow_delimiters = {
+    \ 'strategy': {
+        \ '': rainbow_delimiters#strategy.global,
+        \ 'vim': rainbow_delimiters#strategy.local,
+    \ },
+    \ 'query': {
+        \ '': 'rainbow-delimiters',
+        \ 'lua': 'rainbow-blocks',
+    \ },
+    \ 'priority': {
+        \ '': 110,
+        \ 'lua': 210,
+    \ },
+    \ 'highlight': [
+        \ 'RainbowDelimiterRed',
+        \ 'RainbowDelimiterYellow',
+        \ 'RainbowDelimiterBlue',
+        \ 'RainbowDelimiterOrange',
+        \ 'RainbowDelimiterGreen',
+        \ 'RainbowDelimiterViolet',
+        \ 'RainbowDelimiterCyan',
+    \ ],
+\ }
 " }}}
 
 " Plug Config: indent-blankline {{{

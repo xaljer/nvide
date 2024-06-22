@@ -225,6 +225,8 @@ Plug g:NvideConf_PluginDownloadAddr . 'tpope/vim-surround'
 Plug g:NvideConf_PluginDownloadAddr . 'AndrewRadev/linediff.vim'
 Plug g:NvideConf_PluginDownloadAddr . 'notomo/gesture.nvim'
 Plug g:NvideConf_PluginDownloadAddr . 'numToStr/Comment.nvim'
+Plug g:NvideConf_PluginDownloadAddr . 'kevinhwang91/promise-async'
+Plug g:NvideConf_PluginDownloadAddr . 'kevinhwang91/nvim-ufo'
 
 if g:NvideConf_UseIdeFeature == 1
 " ========= IDE features ==========
@@ -243,9 +245,9 @@ Plug g:NvideConf_PluginDownloadAddr . 'nvim-lua/plenary.nvim'
 Plug g:NvideConf_PluginDownloadAddr . 'lewis6991/gitsigns.nvim'
 Plug g:NvideConf_PluginDownloadAddr . 'rhysd/git-messenger.vim'
 Plug g:NvideConf_PluginDownloadAddr . 'f-person/git-blame.nvim'
+Plug g:NvideConf_PluginDownloadAddr . 'sindrets/diffview.nvim'
+
 Plug g:NvideConf_PluginDownloadAddr . 'skywind3000/asyncrun.vim'
-Plug g:NvideConf_PluginDownloadAddr . 'kevinhwang91/promise-async'
-Plug g:NvideConf_PluginDownloadAddr . 'kevinhwang91/nvim-ufo'
 Plug g:NvideConf_PluginDownloadAddr . 'scrooloose/nerdtree', { 'on': ['NERDTree', 'NERDTreeToggle', 'NERDTreeVCS'] }
 
 if g:NvideConf_UseDevIcons == 1
@@ -366,27 +368,18 @@ endif
 if isdirectory(expand(g:NvideConf_PluginDirectory . 'nvim-treesitter-context'))
 lua <<EOF
 require'treesitter-context'.setup{
-    enable = true,   -- Enable this plugin (Can be enabled/disabled later via commands)
-    throttle = true, -- Throttles plugin updates (may improve performance)
-    max_lines = 50,  -- How many lines the window should span. Values <= 0 mean no limit.
-    patterns = { -- Match patterns for TS nodes. These get wrapped to match at word boundaries.
-        -- For all filetypes
-        -- Note that setting an entry here replaces all other patterns for this entry.
-        -- By setting the 'default' entry below, you can control which nodes you want to
-        -- appear in the context window.
-        default = {
-            'class',
-            'function',
-            'method',
-            'struct',
-            'enum',
-            'for',
-            'while',
-            'if',
-            'switch',
-            'case',
-        },
-    },
+  enable = true, -- Enable this plugin (Can be enabled/disabled later via commands)
+  max_lines = 50, -- How many lines the window should span. Values <= 0 mean no limit.
+  min_window_height = 0, -- Minimum editor window height to enable context. Values <= 0 mean no limit.
+  line_numbers = true,
+  multiline_threshold = 20, -- Maximum number of lines to show for a single context
+  trim_scope = 'outer', -- Which context lines to discard if `max_lines` is exceeded. Choices: 'inner', 'outer'
+  mode = 'cursor',  -- Line used to calculate context. Choices: 'cursor', 'topline'
+  -- Separator between context and content. Should be a single character string, like '-'.
+  -- When separator is set, the context will only show up when there are at least 2 lines above cursorline.
+  separator = nil,
+  zindex = 20, -- The Z-index of the context window
+  on_attach = nil, -- (fun(buf: integer): boolean) return false to disable attaching
 }
 EOF
 endif

@@ -46,19 +46,18 @@
             "rootPatterns": ["compile_flags.txt", "compile_commands.json", ".repo/", ".git/", ".hg/"],
             "filetypes": ["c", "cpp", "objc", "objcpp"],
             "args": [
+                "--clang-tidy",
                 "--all-scopes-completion",
-                "--index",
                 "--background-index",
-                "--recovery-ast",
-                "--cross-file-rename",
+                "--background-index-priority=normal",
                 "--completion-style=detailed",
-                "--compile_args_from=filesystem",
                 "--fallback-style=llvm",
                 "--function-arg-placeholders",
                 "--header-insertion=never",
                 "--pch-storage=memory",
-                "--limit-results=80",
-                "--suggest-missing-includes",
+                "--malloc-trim",
+                "--limit-results=120",
+                "--limit-references=120",
                 "--hidden-features"
             ]
         }

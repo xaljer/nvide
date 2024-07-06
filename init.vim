@@ -557,7 +557,7 @@ let g:Lf_NumberOfCache = 50
 let g:Lf_NeedCacheTime = 1
 let g:Lf_ShowRelativePath = 1
 let g:Lf_DefaultMode = 'NameOnly'
-let g:Lf_PreviewResult = {'Function':0, 'Tag':0, 'Rg':0, 'Line':1}
+let g:Lf_PreviewResult = {'File': 0, 'Buffer': 0, 'Function': 0, 'Tag': 0, 'Rg': 0, 'Line':1}
 let g:Lf_ReverseOrder = 1
 let g:Lf_PreviewCode = 1
 let g:Lf_PopupWidth = 0.85
@@ -651,7 +651,7 @@ function! s:GoToDefinition()
 endfunction
 
 function! s:FindReference()
-    if CocAction('jumpReference')
+    if CocAction('jumpReferences')
         return v:true
     endif
     execute("match Cursor " . expand("<cword>"))

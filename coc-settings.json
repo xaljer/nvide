@@ -40,6 +40,7 @@
     // Set the delay before spell checking the document. Default is 50.
     "cSpell.spellCheckDelayMs": 50,
 
+    "inlayHint.enable": false,
     "languageserver": {
         "clangd": {
             "command": "clangd",

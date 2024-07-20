@@ -3,6 +3,7 @@ let g:NvideConf_UseIdeFeature = 1
 let g:NvideConf_UsePlugin = 1
 let g:NvideConf_Lf_GtagsStoreInProject = 0
 let g:NvideConf_Lf_Gtagslabel = "native-pygments"
+let g:NvideConf_Lf_Gtagsconf = expand('~/gtags.conf')
 let g:NvideConf_Lf_RootMarkers = ['.repo', '.root', '.svn', '.git']
 let g:NvideConf_Lf_RgSearchType = ''
 let g:NvideConf_CxxSemanticHighlight = 0
@@ -46,6 +47,9 @@ set shiftwidth=4
 set expandtab
 set smarttab
 set cindent
+set breakindent
+set linebreak
+set breakat=,;
 " }}}
 
 " Display {{{
@@ -565,7 +569,7 @@ let g:Lf_PopupHeight = 0.5
 let g:Lf_GtagsAutoGenerate = 0
 let g:Lf_GtagsSkipSymlink = 'f'
 let g:Lf_GtagsSkipUnreadable = 1
-let g:Lf_Gtagsconf = expand('~/gtags.conf')
+let g:Lf_Gtagsconf = g:NvideConf_Lf_Gtagsconf
 let g:Lf_ShortcutF = '<C-P>'
 let g:Lf_DiscardEmptyBuffer = 1
 let g:Lf_NormalMap = {

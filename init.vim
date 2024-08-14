@@ -253,6 +253,7 @@ Plug g:NvideConf_PluginDownloadAddr . 'sindrets/diffview.nvim'
 
 Plug g:NvideConf_PluginDownloadAddr . 'skywind3000/asyncrun.vim'
 Plug g:NvideConf_PluginDownloadAddr . 'scrooloose/nerdtree', { 'on': ['NERDTree', 'NERDTreeToggle', 'NERDTreeVCS'] }
+Plug g:NvideConf_PluginDownloadAddr . 'Bekaboo/dropbar.nvim'
 
 if g:NvideConf_UseDevIcons == 1
 Plug g:NvideConf_PluginDownloadAddr . 'ryanoasis/vim-devicons'

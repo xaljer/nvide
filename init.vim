@@ -201,10 +201,11 @@ call plug#begin(g:NvideConf_PluginDirectory)
 " ========= color themes ==========
 Plug g:NvideConf_PluginDownloadAddr . 'vim-airline/vim-airline'
 Plug g:NvideConf_PluginDownloadAddr . 'vim-airline/vim-airline-themes'
-Plug g:NvideConf_PluginDownloadAddr . 'joshdick/onedark.vim'
+Plug g:NvideConf_PluginDownloadAddr . 'olimorris/onedarkpro.nvim'
 Plug g:NvideConf_PluginDownloadAddr . 'arcticicestudio/nord-vim'
 Plug g:NvideConf_PluginDownloadAddr . 'rmehri01/onenord.nvim', { 'branch': 'main' }
 Plug g:NvideConf_PluginDownloadAddr . 'sainnhe/edge'
+Plug g:NvideConf_PluginDownloadAddr . 'norcalli/nvim-colorizer.lua'
 
 " ========= language and syntax enhancement ==========
 Plug g:NvideConf_PluginDownloadAddr . 'nvim-treesitter/nvim-treesitter'
@@ -270,35 +271,64 @@ let g:coc_global_extensions = ['coc-syntax', 'coc-word', 'coc-pairs',
 endif " g:NvideConf_UseIdeFeature
 " }}}
 
-" Plug Config: colorscheme {{{
-let g:onedark_color_overrides = {
-    \ "red":            { "gui": "#e84393", "cterm": "204", "cterm16": "1" },
-    \ "dark_red":       { "gui": "#a7535a", "cterm": "196", "cterm16": "9" },
-    \ "green":          { "gui": "#41b349", "cterm": "114", "cterm16": "2" },
-    \ "yellow":         { "gui": "#fdcb6e", "cterm": "180", "cterm16": "3" },
-    \ "dark_yellow":    { "gui": "#e2c027", "cterm": "173", "cterm16": "11" },
-    \ "blue":           { "gui": "#6cb6eb", "cterm": "39", "cterm16": "4" },
-    \ "purple":         { "gui": "#a29bfe", "cterm": "170", "cterm16": "5" },
-    \ "cyan":           { "gui": "#81ecec", "cterm": "38", "cterm16": "6" },
-    \ "white":          { "gui": "#d8dee9", "cterm": "145", "cterm16": "7" },
-    \ "black":          { "gui": "#2e3440", "cterm": "235", "cterm16": "0" },
-    \ "visual_black":   { "gui": "NONE",    "cterm": "NONE", "cterm16": "0" },
-    \ "comment_grey":   { "gui": "#a4b0be", "cterm": "59", "cterm16": "15" },
-    \ "gutter_fg_grey": { "gui": "#4B5263", "cterm": "238", "cterm16": "15" },
-    \ "cursor_grey":    { "gui": "#2C323C", "cterm": "236", "cterm16": "8" },
-    \ "visual_grey":    { "gui": "#3E4452", "cterm": "237", "cterm16": "15" },
-    \ "menu_grey":      { "gui": "#3E4452", "cterm": "237", "cterm16": "8" },
-    \ "special_grey":   { "gui": "#3B4048", "cterm": "238", "cterm16": "15" },
-    \ "vertsplit":      { "gui": "#181A1F", "cterm": "59", "cterm16": "15" },
-    \}
+lua <<EOF
+require("onedarkpro").setup({
+  colors = {
+    onedark        = { bg = "#2E3440" },
+    red            = "#CE5E8A",
+    dark_red       = "#A7535A",
+    green          = "#83A78D",
+    yellow         = "#FDCB6E",
+    dark_yellow    = "#E2C027",
+    blue           = "#6CB6EB",
+    purple         = "#A29BFE",
+    cyan           = "#81ECEC",
+    white          = "#D8DEE9",
+    black          = "#2E3440",
+    grey           = "#3B4252",
+    qiubolan       = "#8ABCD1",
+    danjianghuang  = "#F9D770",
+    caozhuhong     = "#F8EBE6",
+    ganlanshilv    = "#B2CF87",
+    aibeilv        = "#DFECD5",
+    biandouzi      = "#A35C8F",
+    diaozhonghua   = "#CE5E8A",
+    qionggui       = "#c4d7d6",
+  },
+  highlights = {
+    ["@label.c"]    = { fg = "${danjianghuang}" },
+    ["@constant.c"] = { fg = "${cyan}" },
+    ["@comment"]    = { italic = true },
+    ["@variable"]   = { fg = "${aibeilv}" },
+    ["@property"]   = { fg = "${qiubolan}" },
+    ["@operator"]   = { fg = "${purple}" },
+    ["@function"]   = { fg = "${diaozhonghua}" },
+    ["Type"]        = { fg = "${ganlanshilv}" },
+    ["Number"]      = { fg = "${danjianghuang}" },
+    ["Boolean"]     = { fg = "${danjianghuang}" },
+    ["DiagnosticUnderlineInfo"] = { fg = "${yellow}" }
+  },
+})
+EOF
+
+lua <<EOF
+local colors = require("onenord.colors").load()
+
+require("onenord").setup({
+  custom_highlights = {
+    ["@function"]  = { fg = colors.green },
+    ["@string"]    = { fg = colors.cyan },
+  },
+})
+EOF
 
 let g:edge_better_performance = 1
 let g:edge_style = 'neon'
 
 "colorscheme edge
 "colorscheme nord
-colorscheme onenord
-"silent! colorscheme onedark
+" colorscheme onenord
+silent! colorscheme onedark
 " }}}
 
 " Plug Config: airline {{{

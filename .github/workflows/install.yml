@@ -57,7 +57,7 @@ jobs:
           tar -czf nvim.config.tar.gz nvim.config/
 
       - name: Upload output file
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: nvim.config
           path: nvim.config.tar.gz

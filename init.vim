@@ -245,6 +245,10 @@ Plug g:NvideConf_PluginDownloadAddr . 'neoclide/coc.nvim', {'branch': 'release'}
 Plug g:NvideConf_PluginDownloadAddr . 'Yggdroot/LeaderF', { 'do': ':LeaderfInstallCExtension' }
 Plug g:NvideConf_PluginDownloadAddr . 'Yggdroot/LeaderF-marks'
 
+Plug g:NvideConf_PluginDownloadAddr . 'mfussenegger/nvim-dap'
+Plug g:NvideConf_PluginDownloadAddr . 'nvim-neotest/nvim-nio'
+Plug g:NvideConf_PluginDownloadAddr . 'rcarriga/nvim-dap-ui'
+
 Plug g:NvideConf_PluginDownloadAddr . 'tpope/vim-fugitive'
 Plug g:NvideConf_PluginDownloadAddr . 'nvim-lua/plenary.nvim'
 Plug g:NvideConf_PluginDownloadAddr . 'lewis6991/gitsigns.nvim'
@@ -771,6 +775,20 @@ require('ufo').setup({
     fold_virt_text_handler = handler,
 })
 EOF
+
+" Plug Config: dap {{{
+lua << EOF
+require("dapui").setup()
+local dap = require("dap")
+
+dap.adapters.cppdbg = {
+  id = 'cppdbg',
+  type = 'executable',
+  command = '~/bin/debugAdapters/bin/OpenDebugAD7',
+}
+require('dap.ext.vscode').load_launchjs(nil, { cppdbg = {'c', 'cpp'} })
+EOF
+
 "}}}
 
 endif " g:NvideConf_UseIdeFeature

@@ -258,6 +258,8 @@ Plug g:NvideConf_PluginDownloadAddr . 'sindrets/diffview.nvim'
 
 Plug g:NvideConf_PluginDownloadAddr . 'skywind3000/asyncrun.vim'
 Plug g:NvideConf_PluginDownloadAddr . 'scrooloose/nerdtree', { 'on': ['NERDTree', 'NERDTreeToggle', 'NERDTreeVCS'] }
+Plug g:NvideConf_PluginDownloadAddr . 'Rolv-Apneseth/tfm.nvim'
+
 Plug g:NvideConf_PluginDownloadAddr . 'Bekaboo/dropbar.nvim'
 
 if g:NvideConf_UseDevIcons == 1
@@ -788,7 +790,26 @@ dap.adapters.cppdbg = {
 }
 require('dap.ext.vscode').load_launchjs(nil, { cppdbg = {'c', 'cpp'} })
 EOF
+"}}}
 
+" Plug Config: tfm {{{
+lua << EOF
+require("tfm").setup {
+  file_manager = "yazi",
+  replace_netrw = true,
+  enable_cmds = true,
+  ui = {
+    border = "rounded",
+    height = 1,
+    width = 1,
+    x = 0.5,
+    y = 0.5,
+  },
+}
+EOF
+nnoremap <Leader>t :Tfm<CR>
+nnoremap <Leader>tv :TfmVsplit<CR>
+nnoremap <Leader>th :TfmSplit<CR>
 "}}}
 
 endif " g:NvideConf_UseIdeFeature

@@ -207,6 +207,10 @@ Plug g:NvideConf_PluginDownloadAddr . 'rmehri01/onenord.nvim', { 'branch': 'main
 Plug g:NvideConf_PluginDownloadAddr . 'sainnhe/edge'
 Plug g:NvideConf_PluginDownloadAddr . 'norcalli/nvim-colorizer.lua'
 
+" ========= utilities ==========
+Plug g:NvideConf_PluginDownloadAddr . 'inkarkat/vim-ingo-library' "Vimscript library of common functions
+Plug g:NvideConf_PluginDownloadAddr . 'nvim-lua/plenary.nvim' "Lua functions utils
+
 " ========= language and syntax enhancement ==========
 Plug g:NvideConf_PluginDownloadAddr . 'nvim-treesitter/nvim-treesitter'
 Plug g:NvideConf_PluginDownloadAddr . 'nvim-treesitter/nvim-treesitter-refactor'
@@ -215,7 +219,6 @@ Plug g:NvideConf_PluginDownloadAddr . 'nvim-treesitter/nvim-treesitter-context'
 Plug g:NvideConf_PluginDownloadAddr . 'HiPhish/rainbow-delimiters.nvim'
 
 " ========= edit enhancement ==========
-Plug g:NvideConf_PluginDownloadAddr . 'inkarkat/vim-ingo-library'
 Plug g:NvideConf_PluginDownloadAddr . 'inkarkat/vim-mark'
 Plug g:NvideConf_PluginDownloadAddr . 'bronson/vim-visual-star-search'
 Plug g:NvideConf_PluginDownloadAddr . 'lukas-reineke/indent-blankline.nvim'
@@ -233,34 +236,35 @@ Plug g:NvideConf_PluginDownloadAddr . 'numToStr/Comment.nvim'
 Plug g:NvideConf_PluginDownloadAddr . 'kevinhwang91/promise-async'
 Plug g:NvideConf_PluginDownloadAddr . 'kevinhwang91/nvim-ufo'
 
+" ========= file manager ==========
+Plug g:NvideConf_PluginDownloadAddr . 'scrooloose/nerdtree', { 'on': ['NERDTree', 'NERDTreeToggle', 'NERDTreeVCS'] }
+Plug g:NvideConf_PluginDownloadAddr . 'Rolv-Apneseth/tfm.nvim'
+
 if g:NvideConf_UseIdeFeature == 1
 " ========= IDE features ==========
 " requirements:
 " - python3 (packages: neovim, pygments)
-" - nodejs, yarn
+" - nodejs
 " - ctags, gtags
 " - ripgrep
 " - LSP server (clangd, ccls, ...)
 Plug g:NvideConf_PluginDownloadAddr . 'neoclide/coc.nvim', {'branch': 'release'}
 Plug g:NvideConf_PluginDownloadAddr . 'Yggdroot/LeaderF', { 'do': ':LeaderfInstallCExtension' }
 Plug g:NvideConf_PluginDownloadAddr . 'Yggdroot/LeaderF-marks'
+Plug g:NvideConf_PluginDownloadAddr . 'skywind3000/asyncrun.vim'
+Plug g:NvideConf_PluginDownloadAddr . 'Bekaboo/dropbar.nvim'
 
+" ========= debugger ==========
 Plug g:NvideConf_PluginDownloadAddr . 'mfussenegger/nvim-dap'
 Plug g:NvideConf_PluginDownloadAddr . 'nvim-neotest/nvim-nio'
 Plug g:NvideConf_PluginDownloadAddr . 'rcarriga/nvim-dap-ui'
 
+" ========= git ==========
 Plug g:NvideConf_PluginDownloadAddr . 'tpope/vim-fugitive'
-Plug g:NvideConf_PluginDownloadAddr . 'nvim-lua/plenary.nvim'
 Plug g:NvideConf_PluginDownloadAddr . 'lewis6991/gitsigns.nvim'
 Plug g:NvideConf_PluginDownloadAddr . 'rhysd/git-messenger.vim'
 Plug g:NvideConf_PluginDownloadAddr . 'f-person/git-blame.nvim'
 Plug g:NvideConf_PluginDownloadAddr . 'sindrets/diffview.nvim'
-
-Plug g:NvideConf_PluginDownloadAddr . 'skywind3000/asyncrun.vim'
-Plug g:NvideConf_PluginDownloadAddr . 'scrooloose/nerdtree', { 'on': ['NERDTree', 'NERDTreeToggle', 'NERDTreeVCS'] }
-Plug g:NvideConf_PluginDownloadAddr . 'Rolv-Apneseth/tfm.nvim'
-
-Plug g:NvideConf_PluginDownloadAddr . 'Bekaboo/dropbar.nvim'
 
 if g:NvideConf_UseDevIcons == 1
 Plug g:NvideConf_PluginDownloadAddr . 'ryanoasis/vim-devicons'
@@ -350,7 +354,13 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#formatter = 'unique_tail'
 " }}}
 
-" Plug Config: vim-mark {{{
+" Plug Config: plenary.nvim {{{
+" Using "flamegraph profile.log > flame.svg" to generate flame graph.
+command StartPerf :lua require'plenary.profile'.start("profile.log", {flame = true})
+command StopPerf :lua require'plenary.profile'.stop()
+" }}}
+
+"" Plug Config: vim-mark {{{
 let g:mwDefaultHighlightingPalette = 'extended'
 let g:mwDefaultHighlightingNum = 8
 let g:mwHistAdd = '/@'
@@ -376,7 +386,7 @@ require'nvim-treesitter.configs'.setup {
     enable = true,            -- false will disable the whole extension
   },
   refactor = {
-    highlight_definitions = { enable = true },
+    highlight_definitions = { enable = false },
   },
   textobjects = {
     move = {

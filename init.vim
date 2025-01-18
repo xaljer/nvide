@@ -788,18 +788,19 @@ require('ufo').setup({
 })
 EOF
 
-" Plug Config: dap {{{
+" Plug Config: dap and dapui {{{
 lua << EOF
-require("dapui").setup()
 local dap = require("dap")
-
 dap.adapters.cppdbg = {
   id = 'cppdbg',
   type = 'executable',
   command = '~/bin/debugAdapters/bin/OpenDebugAD7',
 }
 require('dap.ext.vscode').load_launchjs(nil, { cppdbg = {'c', 'cpp'} })
+
+require("dapui").setup()
 EOF
+nnoremap <F5> :lua require("dapui").toggle()<CR>
 "}}}
 
 " Plug Config: tfm {{{

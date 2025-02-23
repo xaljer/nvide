@@ -210,6 +210,7 @@ Plug g:NvideConf_PluginDownloadAddr . 'norcalli/nvim-colorizer.lua'
 " ========= utilities ==========
 Plug g:NvideConf_PluginDownloadAddr . 'inkarkat/vim-ingo-library' "Vimscript library of common functions
 Plug g:NvideConf_PluginDownloadAddr . 'nvim-lua/plenary.nvim' "Lua functions utils
+Plug g:NvideConf_PluginDownloadAddr . 't-troebst/perfanno.nvim'
 
 " ========= language and syntax enhancement ==========
 Plug g:NvideConf_PluginDownloadAddr . 'nvim-treesitter/nvim-treesitter'
@@ -360,7 +361,11 @@ command StartPerf :lua require'plenary.profile'.start("profile.log", {flame = tr
 command StopPerf :lua require'plenary.profile'.stop()
 " }}}
 
-"" Plug Config: vim-mark {{{
+" Plug Config: perfanno.nvim {{{
+lua require("perfanno").setup()
+" }}}
+
+" Plug Config: vim-mark {{{
 let g:mwDefaultHighlightingPalette = 'extended'
 let g:mwDefaultHighlightingNum = 8
 let g:mwHistAdd = '/@'
@@ -523,12 +528,10 @@ endif
 
 " Plug Config: hop.nvim {{{
 if isdirectory(expand(g:NvideConf_PluginDirectory . 'hop.nvim'))
-lua << EOF
-require'hop'.setup()
-EOF
-nnoremap <Leader><Leader>  :HopWord<cr>
-nnoremap <Leader>j         :HopChar1<cr>
-nnoremap g/                :HopPattern<cr>
+  lua require'hop'.setup()
+  nnoremap <Leader><Leader>  :HopWord<cr>
+  nnoremap <Leader>j         :HopChar1<cr>
+  nnoremap g/                :HopPattern<cr>
 endif
 "}}}
 

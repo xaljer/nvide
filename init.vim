@@ -257,8 +257,7 @@ Plug g:NvideConf_PluginDownloadAddr . 'Bekaboo/dropbar.nvim'
 
 " ========= debugger ==========
 Plug g:NvideConf_PluginDownloadAddr . 'mfussenegger/nvim-dap'
-Plug g:NvideConf_PluginDownloadAddr . 'nvim-neotest/nvim-nio'
-Plug g:NvideConf_PluginDownloadAddr . 'rcarriga/nvim-dap-ui'
+Plug g:NvideConf_PluginDownloadAddr . 'miroshQa/debugmaster.nvim'
 
 " ========= git ==========
 Plug g:NvideConf_PluginDownloadAddr . 'tpope/vim-fugitive'
@@ -807,9 +806,13 @@ dap.adapters.cppdbg = {
 }
 require('dap.ext.vscode').load_launchjs(nil, { cppdbg = {'c', 'cpp'} })
 
-require("dapui").setup()
+local dm = require("debugmaster")
+vim.keymap.set({ "n", "v" }, "<leader>d", dm.mode.toggle, { nowait = true })
+-- If you want to disable debug mode in addition to leader+d using the Escape key:
+-- vim.keymap.set("n", "<Esc>", dm.mode.disable)
+-- This might be unwanted if you already use Esc for ":noh"
+vim.keymap.set("t", "<C-\\>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 EOF
-nnoremap <F5> :lua require("dapui").toggle()<CR>
 "}}}
 
 " Plug Config: tfm {{{

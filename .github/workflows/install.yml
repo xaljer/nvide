@@ -1,4 +1,4 @@
-name: install plugins from scratch
+name: Install Neovim with Plugins
 
 on:
   workflow_dispatch:
@@ -7,57 +7,86 @@ on:
   pull_request:
     branches: [ main ]
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   install:
-    runs-on: ubuntu-22.04
-
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, macos-latest]  # 同时支持 Ubuntu 和 macOS
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           path: nvim.config/nvim
 
-      - name: Install dependencies
+      # 系统依赖安装（按操作系统区分）
+      - name: Install system dependencies
         run: |
-          sudo apt-get update
-          sudo apt install -y python3 python3-dev nodejs git gcc
-          sudo apt install -y libfuse2
-          sudo pip install -U pip setuptools
-          sudo pip install pynvim
+          if [ "${{ matrix.os }}" == "ubuntu-22.04" ]; then
+            sudo apt-get update
+            sudo apt install -y python3 python3-dev nodejs git gcc libfuse2
+            sudo pip install -U pip setuptools
+            sudo pip install pynvim
+          elif [ "${{ matrix.os }}" == "macos-latest" ]; then
+            brew update
+            brew install python node git pkg-config neovim
+            pip install -U pip setuptools
+            pip install pynvim
+          fi
 
-      - name: Install neovim and plugins
+      # 安装 Neovim 和插件
+      - name: Install Neovim and plugins
         run: |
           cd $GITHUB_WORKSPACE
-          echo "=========start to install neovim and plug.vim========"
-          curl -fLo nvim --create-dirs https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.appimage
-          chmod u+x nvim
+
+          # 下载对应系统的 Neovim
+          if [ "${{ matrix.os }}" == "ubuntu-22.04" ]; then
+            echo "========= Downloading Neovim for Linux ========="
+            curl -fLo nvim --create-dirs https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.appimage
+            chmod u+x nvim
+          else
+            # echo "========= Downloading Neovim for macOS ========="
+            # curl -fLo nvim-macos.tar.gz https://github.com/neovim/neovim/releases/download/nightly/nvim-macos-x86_64.tar.gz
+            # tar xzf nvim-macos.tar.gz
+            # mv nvim-macos/bin/nvim nvim
+            # chmod u+x nvim
+            # rm -rf nvim-macos nvim-macos.tar.gz
+          fi
+
+          # 安装插件管理器
+          echo "========= Installing plug.vim ========="
           curl -fLo nvim.config/nvim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
-          echo "=========start to install plugins========="
+          # 安装插件
+          echo "========= Installing plugins ========="
           ./nvim +PlugInstall +qall --headless
 
+          # 安装 LeaderF
+          echo "========= Installing LeaderF ========="
           cd nvim.config/nvim/plugged/LeaderF/
           ./install.sh
           cd $GITHUB_WORKSPACE
 
-          echo "=========start to install parsers of tree-sitter========="
+          # 安装 Tree-sitter 解析器
+          echo "========= Installing Tree-sitter parsers ========="
           ./nvim +"TSInstallSync all" +qall --headless
 
-          echo "=========start to install plugins of coc========="
+          # 安装 CoC 扩展
+          echo "========= Installing CoC extensions ========="
           mkdir -p nvim.config/coc/extensions
           cd nvim.config/coc/extensions
-          if [ ! -f package.json ]
-          then
-            echo '{"dependencies":{}}'> package.json
+          if [ ! -f package.json ]; then
+            echo '{"dependencies":{}}' > package.json
           fi
           npm install coc-snippets coc-syntax coc-word coc-pairs coc-lists coc-yank coc-spell-checker coc-json coc-python coc-vimlsp --global-style --ignore-scripts --no-bin-links --no-package-lock --only=prod
-
           cd $GITHUB_WORKSPACE
-          tar -czf nvim.config.tar.gz nvim.config/
 
-      - name: Upload output file
+          # 打包配置（包含操作系统标识）
+          echo "========= Packaging config ========="
+          tar -czf nvim.config-${{ matrix.os }}.tar.gz nvim.config/
+
+      # 上传带操作系统标识的产物
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: nvim.config
-          path: nvim.config.tar.gz
+          name: nvim.config-${{ matrix.os }}
+          path: nvim.config-${{ matrix.os }}.tar.gz

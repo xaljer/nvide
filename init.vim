@@ -266,6 +266,9 @@ Plug g:NvideConf_PluginDownloadAddr . 'rhysd/git-messenger.vim'
 Plug g:NvideConf_PluginDownloadAddr . 'f-person/git-blame.nvim'
 Plug g:NvideConf_PluginDownloadAddr . 'sindrets/diffview.nvim'
 
+" ========= AI/LLM ==========
+Plug g:NvideConf_PluginDownloadAddr . 'olimorris/codecompanion.nvim', { 'branch': 'main' }
+
 if g:NvideConf_UseDevIcons == 1
 Plug g:NvideConf_PluginDownloadAddr . 'ryanoasis/vim-devicons'
 endif
@@ -833,6 +836,59 @@ EOF
 nnoremap <Leader>t :Tfm<CR>
 nnoremap <Leader>tv :TfmVsplit<CR>
 nnoremap <Leader>th :TfmSplit<CR>
+"}}}
+
+" Plug Config: codecompanion {{{
+lua << EOF
+require("codecompanion").setup({
+  opts = {
+    log_level = "INFO",
+  },
+  adapters = {
+    -- OpenAI (支持 OpenAI、DeepSeek 等兼容的 API)
+    openai = function()
+      require("codecompanion.adapters.openai").setup({
+        env = {
+          OPENAI_API_KEY = os.getenv("OPENAI_API_KEY"),
+        },
+        model = "gpt-4o",
+      })
+    end,
+    -- DeepSeek
+    deepseek = function()
+      require("codecompanion.adapters.openai").setup({
+        env = {
+          OPENAI_API_KEY = os.getenv("DEEPSEEK_API_KEY"),
+        },
+        model = "deepseek-chat",
+        base_url = "https://api.deepseek.com/v1",
+      })
+    end,
+    -- Anthropic Claude
+    anthropic = function()
+      require("codecompanion.adapters.anthropic").setup({
+        env = {
+          ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY"),
+        },
+        model = "claude-sonnet-4-20250514",
+      })
+    end,
+    -- Ollama (本地)
+    ollama = function()
+      require("codecompanion.adapters.ollama").setup()
+    end,
+  },
+  -- 默认 adapter
+  default_adapter = "ollama",
+})
+EOF
+
+" 打开 CodeCompanion Chat
+nnoremap <Leader>cc :CodeCompanionChat<CR>
+vnoremap <Leader>cc :CodeCompanionChat<CR>
+" 打开 CodeCompanion inline assistant
+nnoremap <Leader>ca :CodeCompanionAction<CR>
+vnoremap <Leader>ca :CodeCompanionAction<CR>
 "}}}
 
 endif " g:NvideConf_UseIdeFeature

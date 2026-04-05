@@ -25,6 +25,10 @@ jobs:
           sudo apt install -y libfuse2
           sudo pip install -U pip setuptools
           sudo pip install pynvim
+          mkdir -p nvim.config/nvim/tools
+          cd nvim.config/nvim/tools
+          npm init -y
+          npm install tree-sitter-cli --no-save
 
       - name: Install neovim and plugins
         run: |
@@ -41,8 +45,11 @@ jobs:
           ./install.sh
           cd $GITHUB_WORKSPACE
 
-          echo "=========start to install parsers of tree-sitter========="
-          ./nvim +"TSInstallSync all" +qall --headless
+          echo "=========start to compile tree-sitter parsers========="
+          chmod +x nvim.config/nvim/scripts/download-parsers.sh
+          chmod +x nvim.config/nvim/scripts/build-parsers.sh
+          nvim.config/nvim/scripts/download-parsers.sh
+          nvim.config/nvim/scripts/build-parsers.sh
 
           echo "=========start to install plugins of coc========="
           mkdir -p nvim.config/coc/extensions

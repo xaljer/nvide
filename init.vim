@@ -6,7 +6,6 @@ let g:NvideConf_Lf_Gtagslabel = "native-pygments"
 let g:NvideConf_Lf_Gtagsconf = expand('~/gtags.conf')
 let g:NvideConf_Lf_RootMarkers = ['.repo', '.root', '.svn', '.git']
 let g:NvideConf_Lf_RgSearchType = ''
-let g:NvideConf_CxxSemanticHighlight = 0
 let g:Nvide_BuildCmd = "make"
 let g:NvideConf_PythonVirtualEnv = ''
 let g:NvideConf_UseDevIcons = 1
@@ -113,7 +112,8 @@ autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "norm
 " }}}
 
 " Utility {{{
-command RmCr %s///g
+command RmCr %s/
+//g
 " }}}
 
 " Key binding {{{
@@ -213,8 +213,6 @@ Plug g:NvideConf_PluginDownloadAddr . 'nvim-lua/plenary.nvim' "Lua functions uti
 Plug g:NvideConf_PluginDownloadAddr . 't-troebst/perfanno.nvim'
 
 " ========= language and syntax enhancement ==========
-Plug g:NvideConf_PluginDownloadAddr . 'nvim-treesitter/nvim-treesitter'
-Plug g:NvideConf_PluginDownloadAddr . 'nvim-treesitter/nvim-treesitter-textobjects'
 Plug g:NvideConf_PluginDownloadAddr . 'nvim-treesitter/nvim-treesitter-context'
 Plug g:NvideConf_PluginDownloadAddr . 'HiPhish/rainbow-delimiters.nvim'
 Plug g:NvideConf_PluginDownloadAddr . 'echasnovski/mini.cursorword'
@@ -251,7 +249,6 @@ if g:NvideConf_UseIdeFeature == 1
 " - LSP server (clangd, ccls, ...)
 Plug g:NvideConf_PluginDownloadAddr . 'neoclide/coc.nvim', {'branch': 'release'}
 Plug g:NvideConf_PluginDownloadAddr . 'Yggdroot/LeaderF', { 'do': ':LeaderfInstallCExtension' }
-Plug g:NvideConf_PluginDownloadAddr . 'Yggdroot/LeaderF-marks'
 Plug g:NvideConf_PluginDownloadAddr . 'skywind3000/asyncrun.vim'
 Plug g:NvideConf_PluginDownloadAddr . 'Bekaboo/dropbar.nvim'
 
@@ -271,9 +268,6 @@ Plug g:NvideConf_PluginDownloadAddr . 'olimorris/codecompanion.nvim', { 'branch'
 
 if g:NvideConf_UseDevIcons == 1
 Plug g:NvideConf_PluginDownloadAddr . 'ryanoasis/vim-devicons'
-endif
-if g:NvideConf_CxxSemanticHighlight == 1
-Plug g:NvideConf_PluginDownloadAddr . 'jackguo380/vim-lsp-cxx-highlight', { 'for': ['c', 'cpp'] }
 endif
 call plug#end()
 
@@ -389,43 +383,10 @@ hi clear MiniCursorword
 hi link MiniCursorword Cursor
 " }}}
 
-" Plug Config: treesitter {{{
-if isdirectory(expand(g:NvideConf_PluginDirectory . 'nvim-treesitter'))
-lua <<EOF
-require'nvim-treesitter.configs'.setup {
-  -- One of "all", "maintained" (parsers with maintainers), or a list of languages
-  ensure_installed = {"c", "cpp", "bash", "python", "json", "jsonc"},
-  highlight = {
-    enable = true,            -- false will disable the whole extension
-  },
-  refactor = {
-    highlight_definitions = { enable = false },
-  },
-  textobjects = {
-    move = {
-      enable = true,
-      goto_next_start = {
-        ["]m"] = "@function.outer",
-        ["]s"] = "@class.outer",
-      },
-      goto_previous_start = {
-        ["[m"] = "@function.outer",
-        ["[s"] = "@class.outer",
-      },
-    },
-    swap = {
-      enable = true,
-      swap_next = {
-        ["<leader>."] = "@parameter.inner",
-      },
-      swap_previous = {
-        ["<leader>,"] = "@parameter.inner",
-      },
-    },
-  },
-}
-EOF
-endif
+" Treesitter {{{
+" Parsers and queries are pre-compiled in CI and placed in parser/ and queries/ directories
+" Enable treesitter highlighting for all filetypes
+autocmd FileType * lua pcall(vim.treesitter.start)
 " }}}
 
 " Plug Config: treesitter-context {{{
@@ -652,7 +613,6 @@ nnoremap <Leader>b  :Leaderf! buffer<CR>
 nnoremap <Leader>ff :Leaderf function --popup<CR>
 nnoremap <Leader>ft :Leaderf tag<CR>
 nnoremap <Leader>fl :Leaderf line<CR>
-nnoremap <Leader>fm :LeaderfMarks<CR>
 
 nnoremap <C-T>      :Leaderf gtags --all --result ctags-mod<CR>
 nnoremap <Leader>fr :match Cursor '<C-R><C-W>'<CR> :<C-U><C-R>=printf("Leaderf! gtags --match-path -r %s", expand("<cword>"))<CR><CR>
@@ -807,7 +767,6 @@ dap.adapters.cppdbg = {
   type = 'executable',
   command = '~/bin/debugAdapters/bin/OpenDebugAD7',
 }
-require('dap.ext.vscode').load_launchjs(nil, { cppdbg = {'c', 'cpp'} })
 
 local dm = require("debugmaster")
 vim.keymap.set({ "n", "v" }, "<leader>d", dm.mode.toggle, { nowait = true })

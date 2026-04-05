@@ -112,8 +112,7 @@ autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "norm
 " }}}
 
 " Utility {{{
-command RmCr %s/
-//g
+command RmCr %s///g
 " }}}
 
 " Key binding {{{

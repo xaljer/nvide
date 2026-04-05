@@ -216,6 +216,7 @@ Plug g:NvideConf_PluginDownloadAddr . 't-troebst/perfanno.nvim'
 Plug g:NvideConf_PluginDownloadAddr . 'nvim-treesitter/nvim-treesitter-context'
 Plug g:NvideConf_PluginDownloadAddr . 'HiPhish/rainbow-delimiters.nvim'
 Plug g:NvideConf_PluginDownloadAddr . 'echasnovski/mini.cursorword'
+Plug g:NvideConf_PluginDownloadAddr . 'MeanderingProgrammer/render-markdown.nvim'
 
 " ========= edit enhancement ==========
 Plug g:NvideConf_PluginDownloadAddr . 'inkarkat/vim-mark'
@@ -381,6 +382,10 @@ lua require('Comment').setup()
 lua require('mini.cursorword').setup({ delay = 200 })
 hi clear MiniCursorword
 hi link MiniCursorword Cursor
+" }}}
+
+" Plug Config: render-markdown {{{
+lua require('render-markdown').setup({})
 " }}}
 
 " Treesitter {{{

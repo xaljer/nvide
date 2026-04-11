@@ -264,7 +264,7 @@ Plug g:NvideConf_PluginDownloadAddr . 'f-person/git-blame.nvim'
 Plug g:NvideConf_PluginDownloadAddr . 'sindrets/diffview.nvim'
 
 " ========= AI/LLM ==========
-Plug g:NvideConf_PluginDownloadAddr . 'olimorris/codecompanion.nvim', { 'branch': 'main' }
+Plug g:NvideConf_PluginDownloadAddr . 'NickvanDyke/opencode.nvim'
 
 if g:NvideConf_UseDevIcons == 1
 Plug g:NvideConf_PluginDownloadAddr . 'ryanoasis/vim-devicons'
@@ -612,7 +612,6 @@ let g:Lf_CtagsFuncOpts = {
 nnoremap <M-r>      :<C-U>Leaderf --recall<CR>
 nnoremap <M-o>      :<C-U>Leaderf --next<CR>
 nnoremap <M-i>      :<C-U>Leaderf --previous<CR>
-nnoremap gf         :LeaderfFileCword<CR>
 nnoremap <Leader>b  :Leaderf! buffer<CR>
 nnoremap <Leader>ff :Leaderf function --popup<CR>
 nnoremap <Leader>ft :Leaderf tag<CR>
@@ -801,57 +800,57 @@ nnoremap <Leader>tv :TfmVsplit<CR>
 nnoremap <Leader>th :TfmSplit<CR>
 "}}}
 
-" Plug Config: codecompanion {{{
+" Plug Config: opencode.nvim {{
+if isdirectory(expand(g:NvideConf_PluginDirectory . 'opencode.nvim'))
 lua << EOF
-require("codecompanion").setup({
-  opts = {
-    log_level = "INFO",
+-- NickvanDyke/opencode.nvim 使用 vim.g.opencode_opts 配置
+vim.g.opencode_opts = {
+  -- 连接已运行的 opencode serve（默认 4096）
+  -- 如需其它端口请改这里，或在外部启动时保持一致
+  server = {
+    port = 4096,
   },
-  adapters = {
-    -- OpenAI (支持 OpenAI、DeepSeek 等兼容的 API)
-    openai = function()
-      require("codecompanion.adapters.openai").setup({
-        env = {
-          OPENAI_API_KEY = os.getenv("OPENAI_API_KEY"),
-        },
-        model = "gpt-4o",
-      })
-    end,
-    -- DeepSeek
-    deepseek = function()
-      require("codecompanion.adapters.openai").setup({
-        env = {
-          OPENAI_API_KEY = os.getenv("DEEPSEEK_API_KEY"),
-        },
-        model = "deepseek-chat",
-        base_url = "https://api.deepseek.com/v1",
-      })
-    end,
-    -- Anthropic Claude
-    anthropic = function()
-      require("codecompanion.adapters.anthropic").setup({
-        env = {
-          ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY"),
-        },
-        model = "claude-sonnet-4-20250514",
-      })
-    end,
-    -- Ollama (本地)
-    ollama = function()
-      require("codecompanion.adapters.ollama").setup()
-    end,
-  },
-  -- 默认 adapter
-  default_adapter = "ollama",
-})
+}
+
+-- 推荐 keymaps（可按需改）
+vim.keymap.set({ "n", "x" }, "<Leader>ca", function()
+  require("opencode").ask("@this: ", { submit = true })
+end, { desc = "Ask opencode" })
+
+vim.keymap.set({ "n", "x" }, "<Leader>cs", function()
+  require("opencode").select()
+end, { desc = "Opencode actions" })
+
+vim.keymap.set({ "n", "t" }, "<Leader>cg", function()
+  require("opencode").toggle()
+end, { desc = "Toggle opencode" })
 EOF
 
-" 打开 CodeCompanion Chat
-nnoremap <Leader>cc :CodeCompanionChat<CR>
-vnoremap <Leader>cc :CodeCompanionChat<CR>
-" 打开 CodeCompanion inline assistant
-nnoremap <Leader>ca :CodeCompanionAction<CR>
-vnoremap <Leader>ca :CodeCompanionAction<CR>
+let g:goto_file_enhance_opts = {
+    \ 'open_mode': 'smart',
+    \ }
+
+" 增强版跳转：支持 path:line[:col] / path#L123
+nnoremap <silent> gF :lua local ok = require('goto_file_enhance').goto_file_enhance(); if not ok then vim.cmd('normal! gF') end<CR>
+
+" gf 统一策略：先 goto_file_enhance，失败再回退 LeaderfFileCword
+lua << EOF
+_G.NvideGotoFile = function()
+  local ok, done = pcall(function()
+    return require('goto_file_enhance').goto_file_enhance()
+  end)
+
+  if ok and done then
+    return
+  end
+
+  vim.cmd('LeaderfFileCword')
+end
+EOF
+
+nnoremap <silent> gf :lua _G.NvideGotoFile()<CR>
+tnoremap <silent> gf <C-\><C-n>:lua _G.NvideGotoFile()<CR>
+endif
 "}}}
 
 endif " g:NvideConf_UseIdeFeature

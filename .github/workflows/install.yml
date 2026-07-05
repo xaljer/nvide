@@ -3,71 +3,110 @@ name: install plugins from scratch
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   install:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, ubuntu-24.04]
+        os: [ubuntu-22.04, ubuntu-24.04, macos-latest]
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
 
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           path: nvim.config/nvim
 
-      - name: Install dependencies
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt install -y python3 python3-dev nodejs git gcc
           sudo apt install -y libfuse2 || sudo apt install -y libfuse2t64 || true
           sudo pip install pynvim
+
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install node python@3
+          pip3 install -U pip setuptools --break-system-packages
+          pip3 install pynvim --break-system-packages
+
+      - name: Install nvim (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          curl -fLo nvim --create-dirs https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.appimage
+          chmod u+x nvim
+          echo "NVIM=${{ github.workspace }}/nvim" >> "$GITHUB_ENV"
+
+      - name: Install nvim (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          ARCH=$(uname -m)
+          if [ "$ARCH" = "arm64" ]; then
+            URL="https://github.com/neovim/neovim/releases/download/nightly/nvim-macos-arm64.tar.gz"
+          else
+            URL="https://github.com/neovim/neovim/releases/download/nightly/nvim-macos-x86_64.tar.gz"
+          fi
+          curl -fLo nvim-macos.tar.gz --create-dirs "$URL"
+          tar xzf nvim-macos.tar.gz
+          NVIM_DIR=$(find . -maxdepth 1 -type d -name 'nvim-macos*' -print -quit)
+          cp "${NVIM_DIR}/bin/nvim" ./nvim
+          chmod +x ./nvim
+          echo "NVIM=${{ github.workspace }}/nvim" >> "$GITHUB_ENV"
+
+      - name: Install plug.vim
+        run: |
+          curl -fLo nvim.config/nvim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+
+      - name: Install npm tools
+        run: |
           mkdir -p nvim.config/nvim/tools
           cd nvim.config/nvim/tools
           npm init -y
           npm install tree-sitter-cli --no-save
 
-      - name: Install neovim and plugins
+      - name: Install plugins
         run: |
-          cd $GITHUB_WORKSPACE
-          echo "=========start to install neovim and plug.vim========"
-          curl -fLo nvim --create-dirs https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.appimage
-          chmod u+x nvim
-          curl -fLo nvim.config/nvim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-
-          echo "=========start to install plugins========="
-          ./nvim +PlugInstall +qall --headless
-
+          "$NVIM" +PlugInstall +qall --headless
           cd nvim.config/nvim/plugged/LeaderF/
           ./install.sh
-          cd $GITHUB_WORKSPACE
+          cd "${{ github.workspace }}"
 
-          echo "=========start to compile tree-sitter parsers========="
+      - name: Compile tree-sitter parsers
+        run: |
           chmod +x nvim.config/nvim/scripts/download-parsers.sh
           chmod +x nvim.config/nvim/scripts/build-parsers.sh
           nvim.config/nvim/scripts/download-parsers.sh
           nvim.config/nvim/scripts/build-parsers.sh
 
-          echo "=========start to install plugins of coc========="
+      - name: Install coc plugins
+        run: |
           mkdir -p nvim.config/coc/extensions
           cd nvim.config/coc/extensions
-          if [ ! -f package.json ]
-          then
-            echo '{"dependencies":{}}'> package.json
+          if [ ! -f package.json ]; then
+            echo '{"dependencies":{}}' > package.json
           fi
           npm install coc-snippets coc-syntax coc-word coc-pairs coc-lists coc-yank coc-spell-checker coc-json coc-python coc-vimlsp --global-style --ignore-scripts --no-bin-links --no-package-lock --only=prod
 
-          cd $GITHUB_WORKSPACE
+      - name: Archive config
+        run: |
+          cd "${{ github.workspace }}"
           tar -czf nvim.config.tar.gz nvim.config/
 
       - name: Upload output file
         uses: actions/upload-artifact@v4
         with:
-          name: nvim.config
+          name: nvim.config-${{ matrix.os }}
           path: nvim.config.tar.gz

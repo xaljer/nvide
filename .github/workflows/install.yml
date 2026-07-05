@@ -64,7 +64,8 @@ jobs:
           NVIM_DIR=$(find . -maxdepth 1 -type d -name 'nvim-macos*' -print -quit)
           cp "${NVIM_DIR}/bin/nvim" ./nvim
           chmod +x ./nvim
-          echo "NVIM=${{ github.workspace }}/nvim" >> "$GITHUB_ENV"
+          echo "NVIM=${PWD}/nvim" >> "$GITHUB_ENV"
+          echo "VIMRUNTIME=${PWD}/${NVIM_DIR}/share/nvim/runtime" >> "$GITHUB_ENV"
 
       - name: Install plug.vim
         run: |

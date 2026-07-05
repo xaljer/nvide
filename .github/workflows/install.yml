@@ -39,9 +39,10 @@ jobs:
       - name: Install dependencies (macOS)
         if: runner.os == 'macOS'
         run: |
-          brew install node python@3
+          brew install node python@3 bash
           pip3 install -U pip setuptools --break-system-packages
           pip3 install pynvim --break-system-packages
+          echo "BASH=$(brew --prefix)/bin/bash" >> "$GITHUB_ENV"
 
       - name: Install nvim (Linux)
         if: runner.os == 'Linux'
@@ -94,7 +95,7 @@ jobs:
         run: |
           chmod +x nvim.config/nvim/scripts/download-parsers.sh
           chmod +x nvim.config/nvim/scripts/build-parsers.sh
-          nvim.config/nvim/scripts/download-parsers.sh
+          "${BASH:-bash}" nvim.config/nvim/scripts/download-parsers.sh
           nvim.config/nvim/scripts/build-parsers.sh
 
       - name: Install coc plugins

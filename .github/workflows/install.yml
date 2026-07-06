@@ -19,7 +19,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, ubuntu-24.04, macos-latest]
+        include:
+          - os: ubuntu-22.04
+            label: ubuntu-2204
+          - os: ubuntu-24.04
+            label: ubuntu-2404
+          - os: macos-latest
+            label: macos
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
 
@@ -110,10 +116,10 @@ jobs:
       - name: Archive config
         run: |
           cd "${{ github.workspace }}"
-          tar -czf nvim.config.tar.gz nvim.config/
+          tar -czf "nvim-config-${{ matrix.label }}.tar.gz" nvim.config/
 
       - name: Upload output file
         uses: actions/upload-artifact@v4
         with:
-          name: nvim.config-${{ matrix.os }}
-          path: nvim.config.tar.gz
+          name: nvim-config-${{ matrix.label }}
+          path: "nvim-config-${{ matrix.label }}.tar.gz"

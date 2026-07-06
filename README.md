@@ -5,8 +5,10 @@ nvide: Personal Neovim configuration for use as an IDE, powered by modern plugin
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
+- [Quick Start: One-click Install](#quick-start-one-click-install)
 - [Quick Start: Download CI Artifact](#quick-start-download-ci-artifact)
 - [Build from Scratch](#build-from-scratch)
+- [Plugin Management](#plugin-management)
 - [Post-Installation](#post-installation)
 - [Verification](#verification)
 - [Troubleshooting](#troubleshooting)
@@ -38,9 +40,31 @@ Without this step, LeaderF will refuse to load with the error:
 
 > LeaderF requires Vim compiled with python and/or a compatible python version.
 
+## Quick Start: One-click Install
+
+The `install.sh` script auto-detects your OS (Ubuntu/Debian or macOS) and bootstraps everything: Neovim binary, clangd, config symlink, vim-plug, plugins, tree-sitter parsers, and coc extensions. It is idempotent — safe to re-run.
+
+```bash
+git clone https://github.com/your-username/nvide.git ~/nvide
+cd ~/nvide
+./install.sh install
+```
+
+On Linux the script downloads the nvim appimage to `~/Downloads/nvim/` and clangd to `~/Downloads/clangd/`, and prints the exact `export PATH=...` lines to add to your shell rc (add them, then restart your shell). On macOS it uses Homebrew (`brew install neovim llvm`).
+
+After the PATH lines are in place:
+
+```bash
+nvim   # open Neovim — see Verification below
+```
+
+Run `./install.sh --help` for all subcommands (`install`, `update`, `clean`, `parsers`, `coc`).
+
+> If you hit any issue, the script runs the same steps documented in [Build from Scratch](#build-from-scratch) below — you can follow that section to debug a specific step.
+
 ## Quick Start: Download CI Artifact
 
-This is the fastest way to get started. The CI pipeline pre-builds everything on Ubuntu.
+This is the fastest way to get started. The CI pipeline pre-builds everything on Ubuntu and macOS.
 
 ### Step 1: Download Neovim
 
@@ -61,11 +85,14 @@ tar xzf nvim-macos-x86_64.tar.gz
 
 1. Go to the [GitHub Actions page](https://github.com/your-username/nvide/actions) of this repository.
 2. Select the latest successful workflow run.
-3. Download the `nvim.config` artifact.
-4. Extract it:
+3. Download the artifact matching your OS — each run produces three, named after the build platform:
+   - `nvim-config-ubuntu-2204` (Ubuntu 22.04)
+   - `nvim-config-ubuntu-2404` (Ubuntu 24.04)
+   - `nvim-config-macos` (macOS, latest)
+4. Extract it (the tarball filename matches the artifact name):
 
 ```bash
-tar xzf nvim.config.tar.gz
+tar xzf nvim-config-ubuntu-2404.tar.gz   # adjust to your OS
 ```
 
 ### Step 3: Set Up the Directory Structure
@@ -204,6 +231,37 @@ let g:NvideConf_PythonVirtualEnv = '/path/to/your/venv'
 
 Otherwise, leave it as empty string `''` and nvim will use the system Python 3.
 
+## Plugin Management
+
+Plugins are managed by [vim-plug](https://github.com/junegunn/vim-plug). The list of plugins is declared with `Plug '...'` lines in `init.vim`. Two ways to manage them:
+
+### Via install.sh subcommands (one command, no nvim interaction)
+
+| Command | What it does |
+|---------|--------------|
+| `./install.sh update` | `:PlugUpdate` (upgrade all plugins) + recompile LeaderF + rebuild tree-sitter parsers + `npm update` coc extensions |
+| `./install.sh clean` | `:PlugClean` (remove plugins whose `Plug` line you deleted from init.vim) |
+| `./install.sh parsers` | Re-download and rebuild tree-sitter parsers only |
+| `./install.sh coc` | (Re)install coc extensions only |
+
+### Via nvim interactive commands (inside nvim)
+
+| Command | When to use |
+|---------|-------------|
+| `:PlugInstall` | After you **add** a new `Plug '...'` line to init.vim — installs the new plugin |
+| `:PlugUpdate` | Upgrade all plugins to their latest upstream version |
+| `:PlugClean` | After you **delete** a `Plug '...'` line from init.vim — removes the now-unwanted plugin directory |
+| `:PlugUpgrade` | Upgrade vim-plug itself (the plugin manager) |
+| `:PlugStatus` | See installed plugins and their status |
+
+### Common workflows
+
+**Add a plugin**: add a `Plug 'author/repo'` line in the plugin section of `init.vim`, save, then either restart nvim and run `:PlugInstall`, or run `./install.sh install` from the shell.
+
+**Remove a plugin**: delete its `Plug '...'` line from `init.vim`, save, then run `:PlugClean` inside nvim (or `./install.sh clean` from the shell).
+
+**Upgrade everything**: `./install.sh update` — one command updates plugins, LeaderF, parsers, and coc extensions together.
+
 ## Verification
 
 After installation, open Neovim and check the following:
@@ -280,29 +338,29 @@ npm install
 
 ## Update
 
-To update all plugins:
+**One command** (updates plugins, LeaderF, tree-sitter parsers, and coc extensions together):
 
 ```bash
-nvim +PlugUpdate +qall --headless
+cd ~/.config/nvim
+./install.sh update
 ```
 
-To update coc.nvim extensions:
-
-```bash
-cd ~/.config/coc/extensions
-npm update
-```
-
-To update to the latest config from this repository:
+To update to the latest config from this repository first:
 
 ```bash
 cd ~/.config/nvim
 git pull
+./install.sh update
 ```
 
-After any update, recompile the LeaderF C extension and tree-sitter parsers:
+### Manual (without install.sh)
 
 ```bash
+# plugins
+nvim +PlugUpdate +qall --headless
+# coc extensions
+cd ~/.config/coc/extensions && npm update
+# LeaderF C extension + tree-sitter parsers (after a plugin or nvim upgrade)
 cd ~/.config/nvim/plugged/LeaderF && ./install.sh
 cd ~/.config/nvim && ./scripts/build-parsers.sh
 ```

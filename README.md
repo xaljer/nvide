@@ -26,6 +26,7 @@ The following tools must be installed on your system:
 | git | any | Plugin management (vim-plug) |
 | gcc / clang | any | Compile LeaderF C extension |
 | ripgrep (rg) | any | Fuzzy search (LeaderF) |
+| [yazi](https://github.com/sxyazi/yazi) | any | Terminal file manager (tfm.nvim, `<Leader>t`) |
 | ctags / gtags | any | Code navigation (optional) |
 
 ### ⚠️ Critical: Install pynvim (most commonly forgotten)
@@ -42,7 +43,7 @@ Without this step, LeaderF will refuse to load with the error:
 
 ## Quick Start: One-click Install
 
-The `install.sh` script auto-detects your OS (Ubuntu/Debian or macOS) and bootstraps everything: Neovim binary, clangd, config symlink, vim-plug, plugins, tree-sitter parsers, and coc extensions. It is idempotent — safe to re-run.
+The `install.sh` script auto-detects your OS (Ubuntu/Debian or macOS) and bootstraps everything: Neovim binary, clangd, config symlink, vim-plug, plugins, tree-sitter parsers, coc extensions, and yazi. It is idempotent — safe to re-run.
 
 ```bash
 git clone https://github.com/your-username/nvide.git ~/nvide

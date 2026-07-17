@@ -284,6 +284,45 @@ install_coc_exts() {
 	info "coc extensions installed: ${COC_EXTS[*]}"
 }
 
+install_yazi() {
+	step 10 "yazi (terminal file manager, used by tfm.nvim <Leader>t)"
+	if have yazi; then
+		info "skip: yazi already in PATH"
+		return
+	fi
+	if ! have cargo; then
+		warn "cargo not found — skipping yazi. Install Rust via rustup, then re-run (or install yazi manually)."
+		return
+	fi
+	# cargo-binstall fetches prebuilt binaries — far faster than building yazi from source.
+	if ! have cargo-binstall; then
+		info "installing cargo-binstall (prebuilt)"
+		curl -L --proto '=https' --tlsv1.2 -sSf \
+			https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh \
+			| bash >/dev/null 2>&1 || {
+			warn "cargo-binstall install failed — skipping yazi (non-fatal)"
+			return
+		}
+	fi
+	# Prebuilt GNU build needs GLIBC_2.39 (absent on Ubuntu 22.04); force the musl
+	# static build on Linux so it runs on older glibc. macOS default target is fine.
+	local binstall_args=(-y)
+	if [[ "$OS" == "linux" ]]; then
+		case "$(uname -m)" in
+			x86_64) binstall_args+=(--target x86_64-unknown-linux-musl) ;;
+			aarch64 | arm64) binstall_args+=(--target aarch64-unknown-linux-musl) ;;
+			*) warn "unrecognized arch $(uname -m) — trying default target (may need newer glibc)" ;;
+		esac
+	fi
+	info "cargo binstall yazi-fm yazi-cli (prebuilt)"
+	if cargo binstall "${binstall_args[@]}" yazi-fm yazi-cli >/dev/null 2>&1; then
+		info "yazi installed to ~/.cargo/bin/"
+		warn "ensure ~/.cargo/bin is on PATH (rustup adds it by default)"
+	else
+		warn "cargo binstall yazi failed (non-fatal) — install yazi manually"
+	fi
+}
+
 do_install() {
 	info "${C_BOLD}nvide bootstrap ($OS)${C_RESET}"
 	install_nvim
@@ -297,7 +336,8 @@ do_install() {
 	install_ts_cli
 	build_parsers
 	install_coc_exts
-	step "✓" "Done. Open nvim to verify. If nvim/clangd PATH warnings appeared, add them to your shell rc and restart."
+	install_yazi
+	step "✓" "Done. Open nvim to verify. If nvim/clangd/yazi PATH warnings appeared, add them to your shell rc and restart."
 }
 
 do_update() {
@@ -342,7 +382,7 @@ Usage: ./install.sh <command>
 
 Commands:
   install    Full bootstrap: nvim, clangd, config symlink, vim-plug,
-             plugins, LeaderF, tree-sitter, coc extensions. (default)
+             plugins, LeaderF, tree-sitter, coc extensions, yazi. (default)
   update     Update plugins (:PlugUpdate), recompile LeaderF,
              rebuild parsers, update coc extensions.
   clean      Remove plugins no longer declared in init.vim (:PlugClean).

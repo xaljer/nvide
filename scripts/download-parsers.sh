@@ -15,14 +15,16 @@ PARSERS=(
     # Web / frontend
     javascript typescript html css
     # Data / config
-    json jsonc json5 yaml toml xml
+    json json5 yaml toml xml
     # Common backend/system languages
     go rust java kotlin c_sharp swift scala
     # SQL / infra
     sql dockerfile
     # Editor / docs
     markdown
-    make gitignore vim vimdoc
+    make vim vimdoc
+    # NOTE: jsonc / gitignore omitted -- no canonical tree-sitter grammar repo
+    # exists under tree-sitter / tree-sitter-grammars / other common orgs.
 )
 
 declare -A REPO_MAP=(
@@ -31,6 +33,9 @@ declare -A REPO_MAP=(
     [perl]="ganezdragon/tree-sitter-perl"
     [c_sharp]="tree-sitter/tree-sitter-c-sharp"
     [dockerfile]="camdencheek/tree-sitter-dockerfile"
+    # sql/vimdoc live outside the tree-sitter org -- map to their real repos.
+    [sql]="DerekStride/tree-sitter-sql"
+    [vimdoc]="neovim/tree-sitter-vimdoc"
 )
 
 echo "========== Downloading parser repos to $SRC_DIR =========="

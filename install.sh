@@ -268,7 +268,7 @@ build_parsers() {
 	fi
 	"$bash_bin" "$REPO_DIR/scripts/download-parsers.sh"
 	"$bash_bin" "$REPO_DIR/scripts/build-parsers.sh"
-	info "parsers built (some grammars with new layouts may SKIP — see README troubleshooting)"
+	info "parsers built"
 }
 
 install_coc_exts() {

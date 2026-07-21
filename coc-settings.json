@@ -56,7 +56,6 @@
                 "--function-arg-placeholders",
                 "--header-insertion=never",
                 "--pch-storage=memory",
-                "--malloc-trim",
                 "--limit-results=120",
                 "--limit-references=120",
                 "--hidden-features"

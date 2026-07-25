@@ -472,6 +472,14 @@ let g:asyncrun_rootmarks = ['.svn', '.git', 'build.xml']
 let g:asyncrun_status = ''
 if isdirectory(expand(g:NvideConf_PluginDirectory . 'vim-airline'))
 let g:airline_section_error = airline#section#create_right(['%{g:asyncrun_status}'])
+" Show the file's directory (home-shortened) in the statusline. The filename
+" itself is already shown by the tabline (top-left), so showing it again here
+" would be redundant -- display only the path to where the file lives.
+function! NvideFilePath()
+	let l:p = expand('%:p:h')
+	return empty(l:p) ? '' : fnamemodify(l:p, ':~') . '/'
+endfunction
+let g:airline_section_c = airline#section#create(['%<', '%{NvideFilePath()}', ' ', '%m'])
 endif
 nnoremap <A-p> :call asyncrun#quickfix_toggle(9)<cr>
 nnoremap <Leader>m :<C-U><C-R>=printf("AsyncRun -cwd=<root> %s", g:Nvide_BuildCmd)<CR>

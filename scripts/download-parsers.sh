@@ -15,16 +15,14 @@ PARSERS=(
     # Web / frontend
     javascript typescript html css
     # Data / config
-    json json5 yaml toml xml
+    json jsonc json5 yaml toml xml
     # Common backend/system languages
     go rust java kotlin c_sharp swift scala
     # SQL / infra
-    sql dockerfile
+    sql dockerfile cmake
     # Editor / docs
     markdown
-    make vim vimdoc
-    # NOTE: jsonc / gitignore omitted -- no canonical tree-sitter grammar repo
-    # exists under tree-sitter / tree-sitter-grammars / other common orgs.
+    make gitignore vim vimdoc
 )
 
 declare -A REPO_MAP=(
@@ -33,9 +31,14 @@ declare -A REPO_MAP=(
     [perl]="ganezdragon/tree-sitter-perl"
     [c_sharp]="tree-sitter/tree-sitter-c-sharp"
     [dockerfile]="camdencheek/tree-sitter-dockerfile"
-    # sql/vimdoc live outside the tree-sitter org -- map to their real repos.
+    # sql/vimdoc/jsonc/gitignore/cmake live outside the tree-sitter org -- map
+    # to their real repos (these are the sources nvim-treesitter points to).
     [sql]="DerekStride/tree-sitter-sql"
     [vimdoc]="neovim/tree-sitter-vimdoc"
+    # jsonc has no canonical GitHub repo; upstream lives on GitLab.
+    [jsonc]="https://gitlab.com/WhyNotHugo/tree-sitter-jsonc.git"
+    [gitignore]="shunsambongi/tree-sitter-gitignore"
+    [cmake]="uyha/tree-sitter-cmake"
 )
 
 echo "========== Downloading parser repos to $SRC_DIR =========="
@@ -52,12 +55,20 @@ for parser in "${PARSERS[@]}"; do
         REPO="tree-sitter/tree-sitter-$parser"
     fi
 
-    git clone --depth 1 "https://github.com/$REPO" "$SRC_DIR/$parser" 2>/dev/null || {
-        git clone --depth 1 "https://github.com/tree-sitter-grammars/tree-sitter-$parser" "$SRC_DIR/$parser" 2>/dev/null || {
+    # REPO may be a full URL (gitlab/etc) -- clone directly; else assume github.
+    if [[ "$REPO" == *"://"* ]]; then
+        git clone --depth 1 "$REPO" "$SRC_DIR/$parser" 2>/dev/null || {
             echo "  [SKIP] Failed to clone $parser"
             continue
         }
-    }
+    else
+        git clone --depth 1 "https://github.com/$REPO" "$SRC_DIR/$parser" 2>/dev/null || {
+            git clone --depth 1 "https://github.com/tree-sitter-grammars/tree-sitter-$parser" "$SRC_DIR/$parser" 2>/dev/null || {
+                echo "  [SKIP] Failed to clone $parser"
+                continue
+            }
+        }
+    fi
     echo "  [OK] $parser"
 done
 

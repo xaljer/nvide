@@ -168,6 +168,42 @@ install_clangd() {
 	esac
 }
 
+install_neocmakelsp() {
+	step "2b" "neocmakelsp (for coc.nvim CMake LSP)"
+	local dest="$HOME/.local/bin"
+	if have neocmakelsp || [[ -x "$dest/neocmakelsp" ]]; then
+		info "skip: neocmakelsp already installed"
+		return
+	fi
+	mkdir -p "$dest"
+	local ver="0.11.0"
+	local arch
+	case "$OS" in
+	linux)
+		case "$(uname -m)" in
+			x86_64)  arch="x86_64-unknown-linux-gnu" ;;
+			aarch64) arch="aarch64-unknown-linux-gnu" ;;
+			*) warn "unsupported linux arch $(uname -m) -- install neocmakelsp manually (cargo install neocmakelsp)"; return ;;
+		esac
+		;;
+	macos)
+		arch="universal-apple-darwin"
+		;;
+	esac
+	local asset="neocmakelsp-$arch.tar.gz"
+	local tmpdir="$HOME/.cache/nvide-neocmakelsp-$$"
+	mkdir -p "$tmpdir"
+	info "downloading neocmakelsp $ver"
+	if curl -fL -o "$tmpdir/$asset" "https://github.com/neocmakelsp/neocmakelsp/releases/download/v$ver/$asset"; then
+		tar xzf "$tmpdir/$asset" -C "$tmpdir"
+		install -m755 "$tmpdir/neocmakelsp" "$dest/neocmakelsp"
+		info "neocmakelsp installed to $dest/neocmakelsp"
+	else
+		warn "download failed -- install neocmakelsp manually (cargo install neocmakelsp or GitHub releases)"
+	fi
+	rm -rf "$tmpdir"
+}
+
 link_config() {
 	step 3 "Symlink ~/.config/nvim -> $REPO_DIR"
 	local target="$HOME/.config/nvim"
@@ -329,6 +365,7 @@ do_install() {
 	prepend_install_dirs
 	install_clangd
 	prepend_install_dirs
+	install_neocmakelsp
 	link_config
 	install_vimplug
 	install_plugins

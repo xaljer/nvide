@@ -60,6 +60,15 @@
                 "--limit-references=120",
                 "--hidden-features"
             ]
+        },
+        "cmake": {
+            "command": "neocmakelsp",
+            "args": ["stdio"],
+            "filetypes": ["cmake"],
+            "rootPatterns": ["CMakeLists.txt", "compile_commands.json", ".git/"],
+            "initializationOptions": {
+                "scan_cmake_in_package": true
+            }
         }
      }
 }

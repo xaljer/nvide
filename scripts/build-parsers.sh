@@ -147,6 +147,65 @@ ensure_inherits() {
 # highlight. Prepend `; inherits: c` so nvim merges the c highlights.
 ensure_inherits cpp highlights.scm c
 
+# Some grammars (jsonc, gitignore) ship no queries in their repo, so build_one
+# copied nothing for them. queries/ is gitignored (pure build output), so these
+# must be written here each build -- same pattern as ensure_inherits above.
+# Content sourced from nvim-treesitter (Apache-2.0), license-compatible with
+# this repo (MIT). Guard with [ -f ] so a grammar that later ships its own
+# queries takes precedence (we only fill in the gaps).
+mkdir -p "$QUERY_DIR/jsonc"
+if [ ! -f "$QUERY_DIR/jsonc/highlights.scm" ]; then
+	cat >"$QUERY_DIR/jsonc/highlights.scm" <<'EOF'
+; inherits: json
+
+(comment) @comment @spell
+EOF
+	echo "  [QUERY] jsonc/highlights.scm (grammar ships none)"
+fi
+
+mkdir -p "$QUERY_DIR/gitignore"
+if [ ! -f "$QUERY_DIR/gitignore/highlights.scm" ]; then
+	cat >"$QUERY_DIR/gitignore/highlights.scm" <<'EOF'
+(comment) @comment @spell
+
+(pattern_char) @string.special.path
+
+[
+  (directory_separator)
+  (directory_separator_escaped)
+] @punctuation.delimiter
+
+[
+  (wildcard_char_single)
+  (wildcard_chars)
+  (wildcard_chars_allow_slash)
+] @character.special
+
+[
+  (pattern_char_escaped)
+  (bracket_char_escaped)
+] @string.escape
+
+(negation) @punctuation.special
+
+(bracket_negation) @operator
+
+; bracket expressions
+[
+  "["
+  "]"
+] @punctuation.bracket
+
+(bracket_char) @constant
+
+(bracket_range
+  "-" @operator)
+
+(bracket_char_class) @constant.builtin
+EOF
+	echo "  [QUERY] gitignore/highlights.scm (grammar ships none)"
+fi
+
 echo "========== Done =========="
 ls -la "$PARSER_DIR"/
 

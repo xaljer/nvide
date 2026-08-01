@@ -46,7 +46,6 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew install node python@3 bash
-          pip3 install -U pip setuptools --break-system-packages
           pip3 install pynvim --break-system-packages
           echo "BASH=$(brew --prefix)/bin/bash" >> "$GITHUB_ENV"
 

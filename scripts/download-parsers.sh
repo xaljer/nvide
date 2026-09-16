@@ -25,21 +25,21 @@ PARSERS=(
     make gitignore vim vimdoc
 )
 
-declare -A REPO_MAP=(
-    [json5]="Joakker/tree-sitter-json5"
-    [yaml]="ikatyang/tree-sitter-yaml"
-    [perl]="ganezdragon/tree-sitter-perl"
-    [c_sharp]="tree-sitter/tree-sitter-c-sharp"
-    [dockerfile]="camdencheek/tree-sitter-dockerfile"
-    # sql/vimdoc/jsonc/gitignore/cmake live outside the tree-sitter org -- map
-    # to their real repos (these are the sources nvim-treesitter points to).
-    [sql]="DerekStride/tree-sitter-sql"
-    [vimdoc]="neovim/tree-sitter-vimdoc"
-    # jsonc has no canonical GitHub repo; upstream lives on GitLab.
-    [jsonc]="https://gitlab.com/WhyNotHugo/tree-sitter-jsonc.git"
-    [gitignore]="shunsambongi/tree-sitter-gitignore"
-    [cmake]="uyha/tree-sitter-cmake"
-)
+lookup_repo() {
+    case "$1" in
+        json5)     echo "Joakker/tree-sitter-json5" ;;
+        yaml)      echo "ikatyang/tree-sitter-yaml" ;;
+        perl)      echo "ganezdragon/tree-sitter-perl" ;;
+        c_sharp)   echo "tree-sitter/tree-sitter-c-sharp" ;;
+        dockerfile) echo "camdencheek/tree-sitter-dockerfile" ;;
+        sql)       echo "DerekStride/tree-sitter-sql" ;;
+        vimdoc)    echo "neovim/tree-sitter-vimdoc" ;;
+        jsonc)     echo "https://gitlab.com/WhyNotHugo/tree-sitter-jsonc.git" ;;
+        gitignore) echo "shunsambongi/tree-sitter-gitignore" ;;
+        cmake)     echo "uyha/tree-sitter-cmake" ;;
+        *)         echo "" ;;
+    esac
+}
 
 echo "========== Downloading parser repos to $SRC_DIR =========="
 mkdir -p "$SRC_DIR"
@@ -48,10 +48,8 @@ for parser in "${PARSERS[@]}"; do
     echo "Downloading: $parser"
     rm -rf "$SRC_DIR/$parser"
 
-    REPO=""
-    if [[ -n "${REPO_MAP[$parser]-}" ]]; then
-        REPO="${REPO_MAP[$parser]}"
-    else
+    REPO="$(lookup_repo "$parser")"
+    if [[ -z "$REPO" ]]; then
         REPO="tree-sitter/tree-sitter-$parser"
     fi
 

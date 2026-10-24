@@ -97,6 +97,42 @@ clangd_version() { clangd --version 2>/dev/null | grep -oE 'version [0-9]+\.[0-9
 
 prepend_install_dirs
 
+# ---------- GitHub access helpers ----------
+# GitHub (and its raw/releases CDNs) is unreachable from some networks:
+# downloads hang instead of failing, which stalls the whole bootstrap. All
+# GitHub fetches go through gh_curl: direct first, then proxy mirrors.
+# GITHUB_MIRROR (a space-separated list of prefixes such as
+# "https://ghfast.top") overrides the built-in mirror list.
+GITHUB_MIRRORS=(${GITHUB_MIRROR:-"https://ghfast.top https://gh-proxy.com"})
+
+# coreutils timeout is `gtimeout` on macOS (brew coreutils); without it we
+# lose the hang protection but the mirror fallback still works.
+TIMEOUT_BIN="$(command -v timeout || command -v gtimeout || true)"
+
+run_to() {
+	local secs="$1"; shift
+	if [[ -n "$TIMEOUT_BIN" ]]; then "$TIMEOUT_BIN" "$secs" "$@"; else "$@"; fi
+}
+
+# gh_curl <github-url> [curl args...] -- curl a github.com /
+# raw.githubusercontent.com URL through the mirror fallback chain. After the
+# first direct attempt times out (exit 28), the rest skip direct entirely.
+GH_CURL_DIRECT_DEAD=0
+gh_curl() {
+	local url="$1"; shift
+	local m
+	if [[ "$GH_CURL_DIRECT_DEAD" -eq 0 ]]; then
+		if curl -fsSL --max-time 120 "$url" "$@"; then
+			return 0
+		fi
+		[[ "$?" -eq 28 ]] && GH_CURL_DIRECT_DEAD=1
+	fi
+	for m in "${GITHUB_MIRRORS[@]}"; do
+		curl -fsSL --max-time 120 "$m/$url" "$@" && return 0
+	done
+	return 1
+}
+
 # ---------- install steps ----------
 
 install_nvim() {
@@ -112,8 +148,8 @@ install_nvim() {
 		local dest="$HOME/Downloads/nvim"
 		mkdir -p "$dest"
 		info "downloading nvim appimage to $dest/nvim"
-		curl -fL -o "$dest/nvim" \
-			https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.appimage ||
+		gh_curl https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.appimage \
+			-o "$dest/nvim" ||
 			{
 				rm -f "$dest/nvim"
 				err "download failed"
@@ -126,8 +162,8 @@ install_nvim() {
 		;;
 	macos)
 		if have brew; then
-			info "brew install neovim bash (bash 5+ required by download-parsers.sh)"
-			brew install neovim bash
+			info "brew install neovim bash coreutils (bash 5+ for download-parsers.sh, coreutils for timeout)"
+			brew install neovim bash coreutils
 		else
 			err "Homebrew not found. Install brew or nvim manually (>= $NVIM_MIN_VERSION)."
 			exit 1
@@ -150,8 +186,8 @@ install_clangd() {
 		local ver="22.1.6"
 		mkdir -p "$dest"
 		info "downloading clangd $ver to $dest"
-		curl -fLO --output-dir "$dest" \
-			"https://github.com/clangd/clangd/releases/download/$ver/clangd-linux-$ver.zip"
+		gh_curl "https://github.com/clangd/clangd/releases/download/$ver/clangd-linux-$ver.zip" \
+			-O --output-dir "$dest"
 		(cd "$dest" && unzip -o "clangd-linux-$ver.zip" >/dev/null)
 		warn "clangd extracted to $dest/clangd_$ver/bin/clangd — add to PATH:"
 		warn "  export PATH=\$HOME/Downloads/clangd/clangd_$ver/bin:\$PATH"
@@ -194,7 +230,7 @@ install_neocmakelsp() {
 	local tmpdir="$HOME/.cache/nvide-neocmakelsp-$$"
 	mkdir -p "$tmpdir"
 	info "downloading neocmakelsp $ver"
-	if curl -fL -o "$tmpdir/$asset" "https://github.com/neocmakelsp/neocmakelsp/releases/download/v$ver/$asset"; then
+	if gh_curl "https://github.com/neocmakelsp/neocmakelsp/releases/download/v$ver/$asset" -o "$tmpdir/$asset"; then
 		tar xzf "$tmpdir/$asset" -C "$tmpdir"
 		install -m755 "$tmpdir/neocmakelsp" "$dest/neocmakelsp"
 		info "neocmakelsp installed to $dest/neocmakelsp"
@@ -229,8 +265,8 @@ install_vimplug() {
 		info "skip: plug.vim present"
 		return
 	fi
-	curl -fLo "$dest" --create-dirs \
-		https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+	gh_curl https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim \
+		-o "$dest" --create-dirs
 	info "installed plug.vim"
 }
 
@@ -263,9 +299,20 @@ compile_leaderf() {
 install_ts_cli() {
 	step 7 "tree-sitter CLI"
 	local cargo_ts="$REPO_DIR/tools/cargo/bin/tree-sitter"
-	if [[ -x "$cargo_ts" ]]; then
+	# -x alone is not enough: a tree copied from another OS keeps a foreign
+	# binary there (exec format error), silently breaking `tree-sitter generate`.
+	if [[ -x "$cargo_ts" ]] && "$cargo_ts" --version >/dev/null 2>&1; then
 		info "skip: $cargo_ts present"
 		return
+	fi
+	if [[ "$OS" == "macos" ]] && have brew; then
+		# bottle install, by far the fastest; `cargo install` can also fail on
+		# macOS setups where cargo fetches git deps over a broken SSH config
+		info "brew install tree-sitter-cli"
+		if brew install tree-sitter-cli >/dev/null 2>&1 && tree-sitter --version >/dev/null 2>&1; then
+			return
+		fi
+		warn "brew tree-sitter-cli failed, falling back to cargo"
 	fi
 	if have cargo; then
 		info "cargo install tree-sitter-cli (builds from source, glibc-safe)"
@@ -333,11 +380,10 @@ install_yazi() {
 	# cargo-binstall fetches prebuilt binaries — far faster than building yazi from source.
 	if ! have cargo-binstall; then
 		info "installing cargo-binstall (prebuilt)"
-		curl -L --proto '=https' --tlsv1.2 -sSf \
+		gh_curl \
 			https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh \
 			| bash >/dev/null 2>&1 || {
-			warn "cargo-binstall install failed — skipping yazi (non-fatal)"
-			return
+			warn "cargo-binstall install failed — skipping binstall, trying release archive"
 		}
 	fi
 	# Prebuilt GNU build needs GLIBC_2.39 (absent on Ubuntu 22.04); force the musl
@@ -350,13 +396,38 @@ install_yazi() {
 			*) warn "unrecognized arch $(uname -m) — trying default target (may need newer glibc)" ;;
 		esac
 	fi
-	info "cargo binstall yazi-fm yazi-cli (prebuilt)"
-	if cargo binstall "${binstall_args[@]}" yazi-fm yazi-cli >/dev/null 2>&1; then
-		info "yazi installed to ~/.cargo/bin/"
-		warn "ensure ~/.cargo/bin is on PATH (rustup adds it by default)"
-	else
-		warn "cargo binstall yazi failed (non-fatal) — install yazi manually"
+	if have cargo-binstall; then
+		info "cargo binstall yazi-fm yazi-cli (prebuilt)"
+		if run_to 300 cargo binstall "${binstall_args[@]}" yazi-fm yazi-cli >/dev/null 2>&1; then
+			info "yazi installed to ~/.cargo/bin/"
+			warn "ensure ~/.cargo/bin is on PATH (rustup adds it by default)"
+			return
+		fi
+		warn "cargo binstall yazi failed (non-fatal) — trying release archive"
 	fi
+	# binstall itself downloads from GitHub and hangs on blocked networks;
+	# fall back to the release zip through the mirror chain.
+	local yarch
+	case "$OS/$(uname -m)" in
+	macos/arm64) yarch="aarch64-apple-darwin" ;;
+	macos/x86_64) yarch="x86_64-apple-darwin" ;;
+	linux/x86_64) yarch="x86_64-unknown-linux-musl" ;;
+	linux/aarch64) yarch="aarch64-unknown-linux-musl" ;;
+	*)
+		warn "unsupported arch $(uname -m) for yazi release fallback"
+		return
+		;;
+	esac
+	local ztmp
+	ztmp="$(mktemp -d)"
+	if gh_curl "https://github.com/sxyazi/yazi/releases/latest/download/yazi-$yarch.zip" -o "$ztmp/yazi.zip" \
+		&& unzip -oq "$ztmp/yazi.zip" -d "$ztmp" \
+		&& install -m755 "$ztmp/yazi-$yarch/yazi" "$ztmp/yazi-$yarch/ya" "$HOME/.cargo/bin/"; then
+		info "yazi installed to ~/.cargo/bin/ (release archive)"
+	else
+		warn "yazi release archive failed (non-fatal) — install yazi manually"
+	fi
+	rm -rf "$ztmp"
 }
 
 do_install() {

@@ -20,14 +20,16 @@ The following tools must be installed on your system:
 
 | Tool | Version | Purpose |
 |------|---------|---------|
-| [Neovim](https://github.com/neovim/neovim/releases) | ≥ 0.9 | Core editor |
+| [Neovim](https://github.com/neovim/neovim/releases) | ≥ 0.11 | Core editor (`install.sh` installs it if missing) |
 | Python 3 | ≥ 3.8 | LeaderF, coc.nvim |
 | Node.js + npm | ≥ 16 | coc.nvim extensions, tree-sitter CLI |
 | git | any | Plugin management (vim-plug) |
-| gcc / clang | any | Compile LeaderF C extension |
+| gcc / clang | any | Compile LeaderF C extension and tree-sitter parsers |
+| [clangd](https://clangd.llvm.org/) | ≥ 15 | C/C++ LSP for coc.nvim (`install.sh` installs it if missing) |
 | ripgrep (rg) | any | Fuzzy search (LeaderF) |
-| [yazi](https://github.com/sxyazi/yazi) | any | Terminal file manager (tfm.nvim, `<Leader>t`) |
 | ctags / gtags | any | Code navigation (optional) |
+
+> [yazi](https://github.com/sxyazi/yazi) (terminal file manager, `<Leader>t`) is optional — `install.sh` installs it as its final step when Rust/cargo or a GitHub release is reachable.
 
 ### ⚠️ Critical: Install pynvim (most commonly forgotten)
 
@@ -43,7 +45,7 @@ Without this step, LeaderF will refuse to load with the error:
 
 ## Quick Start: One-click Install
 
-The `install.sh` script auto-detects your OS (Ubuntu/Debian or macOS) and bootstraps everything: Neovim binary, clangd, neocmakelsp (CMake LSP), config symlink, vim-plug, plugins, tree-sitter parsers, coc extensions, and yazi. It is idempotent — safe to re-run.
+The `install.sh` script auto-detects your OS (Ubuntu/Debian or macOS) and bootstraps everything: Neovim binary, clangd, neocmakelsp (CMake LSP), config symlink, vim-plug, plugins, tree-sitter parsers, coc extensions, and yazi. It is idempotent — safe to re-run. On networks where GitHub is unreachable (e.g. mainland China), all GitHub downloads automatically fall back through public proxy mirrors; set `GITHUB_MIRROR` (space-separated proxy prefixes) to customize the mirror list.
 
 ```bash
 git clone https://github.com/your-username/nvide.git ~/nvide
@@ -51,7 +53,7 @@ cd ~/nvide
 ./install.sh install
 ```
 
-On Linux the script downloads the nvim appimage to `~/Downloads/nvim/` and clangd to `~/Downloads/clangd/`, and prints the exact `export PATH=...` lines to add to your shell rc (add them, then restart your shell). On macOS it uses Homebrew (`brew install neovim llvm`).
+On Linux the script downloads the nvim appimage to `~/Downloads/nvim/` and clangd to `~/Downloads/clangd/`, and prints the exact `export PATH=...` lines to add to your shell rc (add them, then restart your shell). On macOS it uses Homebrew for the toolchain (`brew install neovim bash coreutils llvm tree-sitter-cli`).
 
 After the PATH lines are in place:
 

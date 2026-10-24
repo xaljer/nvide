@@ -8,15 +8,21 @@ ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 DOWNLOAD_DIR="$ROOT_DIR/treesitter-src"
 PARSER_DIR="$ROOT_DIR/parser"
 QUERY_DIR="$ROOT_DIR/queries"
-TS_CLI="$ROOT_DIR/tools/node_modules/.bin/tree-sitter"
+# Pick the first tree-sitter CLI that actually runs: a tree copied from
+# another OS can leave a foreign binary at tools/cargo/bin/tree-sitter
+# (exec format error), which would silently fail every `generate`.
+pick_ts_cli() {
+	local c
+	for c in "$ROOT_DIR/tools/node_modules/.bin/tree-sitter" \
+		"$ROOT_DIR/tools/cargo/bin/tree-sitter" "tree-sitter"; do
+		if [ -x "$c" ] || command -v "$c" >/dev/null 2>&1; then
+			"$c" --version >/dev/null 2>&1 && { echo "$c"; return 0; }
+		fi
+	done
+	return 1
+}
 
-if [ ! -x "$TS_CLI" ]; then
-	TS_CLI="$ROOT_DIR/tools/cargo/bin/tree-sitter"
-fi
-
-if [ ! -x "$TS_CLI" ]; then
-	TS_CLI="tree-sitter"
-fi
+TS_CLI="$(pick_ts_cli)" || TS_CLI=""
 
 mkdir -p "$PARSER_DIR" "$QUERY_DIR"
 
@@ -31,6 +37,21 @@ if [ ! -d "$DOWNLOAD_DIR" ]; then
 	echo "Run ./scripts/download-parsers.sh first."
 	exit 1
 fi
+
+# build_cc_scanner <name> -- compile parser.c as C and link with a C++
+# external scanner; several grammars (e.g. yaml) ship scanner.cc, which the
+# plain gcc invocations cannot link. Run from inside the grammar dir.
+build_cc_scanner() {
+	local name="$1" tmpo
+	tmpo="$(mktemp -d)"
+	cc -c -fPIC -O2 -I src src/parser.c -o "$tmpo/parser.o" 2>/dev/null \
+		&& c++ -c -fPIC -O2 -I src src/scanner.cc -o "$tmpo/scanner.o" 2>/dev/null \
+		&& c++ -shared "$tmpo/parser.o" "$tmpo/scanner.o" \
+			-o "$PARSER_DIR/$name.so" 2>/dev/null
+	local rc=$?
+	rm -rf "$tmpo"
+	return $rc
+}
 
 # Build a single grammar: run `tree-sitter generate` (or fall back to the
 # committed src/parser.c when generate fails -- e.g. grammar.js requires another
@@ -62,11 +83,12 @@ build_one() {
 		gcc -shared -fPIC -O2 -I src -o "$PARSER_DIR/$name.so" \
 			src/parser.c src/scanner.c 2>/dev/null || {
 			gcc -shared -fPIC -O2 -I src -o "$PARSER_DIR/$name.so" \
-				src/parser.c 2>/dev/null || {
-				echo "  [SKIP] Failed to build $name"
-				cd /
-				return 1
-			}
+				src/parser.c 2>/dev/null \
+				|| build_cc_scanner "$name" || {
+					echo "  [SKIP] Failed to build $name"
+					cd /
+					return 1
+				}
 		}
 	}
 
